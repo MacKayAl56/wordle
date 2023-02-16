@@ -1,8 +1,15 @@
 <script setup lang="ts">
-import { ref, Ref } from 'vue'
-const gameName = ref("Wordle Clone")
+import {onBeforeMount, ref, Ref} from 'vue'
 const userWords: Ref<string[]> = ref([])
+const solutionWord: Ref<string[]> = ref([])
 
+onBeforeMount( async () => {
+  const response = await fetch('wordles.txt');
+  const text = await response.text();
+  const wordsArray = text.split('\n').filter(word => word.trim() !== '');
+  const randomWord = wordsArray[Math.floor(Math.random() * wordsArray.length)];
+  solutionWord.value.push(randomWord)
+})
 
 function addOneWord() {
   userWords.value.push("Hi")
@@ -12,9 +19,8 @@ function clearAll() {
   userWords.value.splice(0)
 }
 
-function newGame(){
-  //Select secret random 5-letter word
-  //If previous session of game is already running, clear the grid
+function newGame() {
+//
 }
 
 function check(){
@@ -24,10 +30,13 @@ function check(){
   //Display "Congratulations" if guess it correct
   //Display "Game over" if run out of guesses
 }
+
+
 </script>
 
 <template>
   <p>By: Kyle Smigelski and Alexandra MacKay</p>
+  <p>{{ solutionWord }}</p>
   
   <div id="display" class="grid">
     <div class="box" v-for="index in 30"></div>
@@ -38,6 +47,7 @@ function check(){
     <label for="guess">Next word: </label>
     <input type="text" id="guess">
     <br>
+
     <button @click="newGame" class="button">New Game</button>
     <button @click="check" class="button">Check</button>
     <li v-for="(w, pos) in userWords" v-bind:key="pos">{{ w }}</li>
