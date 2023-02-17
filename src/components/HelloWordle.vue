@@ -37,11 +37,12 @@ function addOneWord(word: string) {
 function newGame() {
   window.location.reload();
 }
+
 function displayWord(word: string) {
   // Display the word in the grid
   const letters = word.split('')
   for (let i = 0; i < letters.length; i++) {
-    document.getElementsByClassName('box')[lettersGuessed.value + i].innerHTML = letters[i]
+    document.getElementsByClassName('box')[lettersGuessed.value + i].innerHTML = letters[i].toUpperCase();
     // if letter is in the solution word at the same position, add class "perfect"
     if (solutionWord.value[0].charAt(i) === letters[i]) {
       document.getElementsByClassName('box')[lettersGuessed.value + i].classList.add('perfect')
@@ -77,8 +78,8 @@ function CheckForWin(word: string) {
   <ul>
     <label for="guess">Next word: </label>
     <input type="text" id="guess" v-model="wordInput">
-    <button @click="addOneWord(wordInput)" class="button">Submit</button>
     <br>
+    <button @click="addOneWord(wordInput)" class="button">Submit</button>
     <button @click="newGame" class="button">New Game</button>
   </ul>
 
@@ -96,8 +97,8 @@ function CheckForWin(word: string) {
   .box{
     outline-style: solid;
     outline-color: lightgray;
-    font-size: large;
-    text-align: center;
+    font-size: xx-large;
+    padding-top: 10%;
   }
 
   .button{
