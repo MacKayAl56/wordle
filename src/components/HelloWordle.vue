@@ -41,6 +41,7 @@ function displayWord(word: string) {
   // Display the word in the grid
   const letters = word.split('')
   for (let i = 0; i < letters.length; i++) {
+    document.getElementsByClassName('box')[lettersGuessed.value + i].innerHTML = letters[i]
     // if letter is in the solution word at the same position, add class "perfect"
     if (solutionWord.value[0].charAt(i) === letters[i]) {
       document.getElementsByClassName('box')[lettersGuessed.value + i].classList.add('perfect')
@@ -49,9 +50,10 @@ function displayWord(word: string) {
     else if (solutionWord.value[0].includes(letters[i])) {
       document.getElementsByClassName('box')[lettersGuessed.value + i].classList.add('misplaced')
     }
-    // if letter is not in the solution word, add class "wrong"
+    // if letter is not in the solution word, add class "wrong" and make letter appear
     else {
       document.getElementsByClassName('box')[lettersGuessed.value + i].classList.add('wrong')
+
     }
   }
   CheckForWin(word)
@@ -96,7 +98,6 @@ function CheckForWin(word: string) {
     outline-color: lightgray;
     font-size: large;
     text-align: center;
-    color: black;
   }
 
   .button{
@@ -109,10 +110,12 @@ function CheckForWin(word: string) {
 
   .perfect{
     background-color: green;
+    color: black;
   }
 
   .misplaced{
     background-color: yellow;
+    color: black;
   }
 
   .wrong{
