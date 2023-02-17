@@ -4,6 +4,7 @@ import {onBeforeMount, ref, Ref} from 'vue'
 const userWords: Ref<string[]> = ref([])
 const solutionWord: Ref<string[]> = ref([])
 const validWords: Ref<string[]> = ref([])
+const lettersGuessed: Ref<number> = ref(0)
 
 // Load the list of solutions from the txt file and choose a random one
 onBeforeMount( async () => {
@@ -19,25 +20,47 @@ onBeforeMount( async () => {
   const response = await fetch('guesses.txt');
   const text = await response.text();
   validWords.value = text.split('\n').filter(word => word.trim() !== '')
-  console.log(validWords.value)
 })
 
 function addOneWord(word: string) {
-  // Add a word to the list of user words if it is valid and has 5 letters
-  if (validWords.value.includes(word) && word.length === 5) {
-      userWords.value.push(word)
-    }
+  // Add a word to the list of user words if it is valid, has 5 letters, and hasn't been guessed before
+  if (validWords.value.includes(word) && word.length === 5 && !userWords.value.includes(word)) {
+    userWords.value.push(word)
+  }
+  // Display the word in the grid
+  displayWord(word)
+  // Add 5 to lettersGuessed
+  lettersGuessed.value += 5
 }
 
 function newGame() {
   window.location.reload();
 }
-function check(){
-  //Check & display guess
-  //Clear current word in input field
-  //If the guess is correct or has reached six guesses, disable button
-  //Display "Congratulations" if guess it correct
-  //Display "Game over" if run out of guesses
+function displayWord(word: string) {
+  // Display the word in the grid
+  const letters = word.split('')
+  for (let i = 0; i < letters.length; i++) {
+    // if letter is in the solution word at the same position, add class "perfect"
+    if (solutionWord.value[0].charAt(i) === letters[i]) {
+      document.getElementsByClassName('box')[lettersGuessed.value + i].classList.add('perfect')
+    }
+    // if letter is in the solution word at a different position, add class "misplaced"
+    else if (solutionWord.value[0].includes(letters[i])) {
+      document.getElementsByClassName('box')[lettersGuessed.value + i].classList.add('misplaced')
+    }
+    // if letter is not in the solution word, add class "wrong"
+    else {
+      document.getElementsByClassName('box')[lettersGuessed.value + i].classList.add('wrong')
+    }
+  }
+  CheckForWin(word)
+}
+
+function CheckForWin(word: string) {
+  // Check if the latest word is the same as the solution word
+  if (solutionWord.value.includes(word)) {
+    alert('You win!')
+  }
 }
 
 </script>
@@ -45,19 +68,17 @@ function check(){
 <template>
   <p>By: Kyle Smigelski and Alexandra MacKay</p>
   <p>{{ solutionWord }}</p>
-  
+
   <div id="display" class="grid">
     <div class="box" v-for="index in 30"></div>
   </div>
 
   <ul>
-    
     <label for="guess">Next word: </label>
     <input type="text" id="guess" v-model="wordInput">
-    <button @click="addOneWord(wordInput)" class="button">Add Word</button>
+    <button @click="addOneWord(wordInput)" class="button">Submit</button>
     <br>
     <button @click="newGame" class="button">New Game</button>
-    <button @click="check" class="button">Check</button>
     <li v-for="(w, pos) in userWords" v-bind:key="pos">{{ w }}</li>
   </ul>
 
@@ -92,5 +113,10 @@ function check(){
   .misplaced{
     background-color: yellow;
   }
+
+  .wrong{
+    background-color: transparent;
+  }
+
 
 </style>
