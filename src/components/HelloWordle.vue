@@ -13,6 +13,7 @@ onBeforeMount( async () => {
   const wordsArray = text.split('\n').filter(word => word.trim() !== '');
   const randomWord = wordsArray[Math.floor(Math.random() * wordsArray.length)];
   solutionWord.value.push(randomWord)
+  console.log(solutionWord.value)
 })
 
 // Load the list of valid words from the txt file
@@ -67,8 +68,6 @@ function CheckForWin(word: string) {
 
 <template>
   <p>By: Kyle Smigelski and Alexandra MacKay</p>
-  <p>{{ solutionWord }}</p>
-
   <div id="display" class="grid">
     <div class="box" v-for="index in 30"></div>
   </div>
@@ -79,7 +78,6 @@ function CheckForWin(word: string) {
     <button @click="addOneWord(wordInput)" class="button">Submit</button>
     <br>
     <button @click="newGame" class="button">New Game</button>
-    <li v-for="(w, pos) in userWords" v-bind:key="pos">{{ w }}</li>
   </ul>
 
 </template>
@@ -96,6 +94,9 @@ function CheckForWin(word: string) {
   .box{
     outline-style: solid;
     outline-color: lightgray;
+    font-size: large;
+    text-align: center;
+    color: black;
   }
 
   .button{
