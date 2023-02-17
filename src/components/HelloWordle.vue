@@ -23,15 +23,24 @@ onBeforeMount( async () => {
   validWords.value = text.split('\n').filter(word => word.trim() !== '')
 })
 
+function displaySecretWord(){
+  const par = document.getElementById("answer");
+  par.innerText = "The answer is: " + solutionWord.value;
+}
+
+
 function addOneWord(word: string) {
   // Add a word to the list of user words if it is valid, has 5 letters, and hasn't been guessed before
-  if (validWords.value.includes(word) && word.length === 5 && !userWords.value.includes(word)) {
+  if (validWords.value.includes(word) && word.length == 5 && userWords.value.includes(word) == false) {
     userWords.value.push(word)
   }
+  //Clear input field
+  const empty = "";
+  var input = document.getElementById("guess");
+  input.value = empty;
   // Display the word in the grid
-  displayWord(word)
-  // Add 5 to lettersGuessed
-  lettersGuessed.value += 5
+  displayWord(word);
+  
 }
 
 function newGame() {
@@ -54,16 +63,29 @@ function displayWord(word: string) {
     // if letter is not in the solution word, add class "wrong" and make letter appear
     else {
       document.getElementsByClassName('box')[lettersGuessed.value + i].classList.add('wrong')
-
     }
   }
+  // Add 5 to lettersGuessed
+  lettersGuessed.value += 5
   CheckForWin(word)
 }
 
+function disableSubmit(){
+    const submitButton = <HTMLButtonElement> document.getElementById("submit");
+    submitButton.setAttribute("disabled","true");
+}
+
 function CheckForWin(word: string) {
+  const stringSolution=solutionWord.value.join("");
   // Check if the latest word is the same as the solution word
-  if (solutionWord.value.includes(word)) {
-    alert('You win!')
+  if (solutionWord.value.join('') === (word)) {
+    alert('Congratulations, you win!');
+    disableSubmit();
+  }
+  if(lettersGuessed.value == 30){
+    alert('You lose. The answer was: '+ solutionWord.value);
+    disableSubmit();
+    newGame();
   }
 }
 
@@ -79,8 +101,11 @@ function CheckForWin(word: string) {
     <label for="guess">Next word: </label>
     <input type="text" id="guess" v-model="wordInput">
     <br>
-    <button @click="addOneWord(wordInput)" class="button">Submit</button>
+    <button @click="addOneWord(wordInput)" class="button" id="submit">Submit</button>
     <button @click="newGame" class="button">New Game</button>
+    <br>
+    <button @click="displaySecretWord" class="button" >Tell me the answer!</button>
+    <h2 id="answer" class="idk"></h2>
   </ul>
 
 </template>
@@ -120,7 +145,8 @@ function CheckForWin(word: string) {
   }
 
   .wrong{
-    background-color: transparent;
+    background-color:gray;
+    color: black;
   }
 
 
