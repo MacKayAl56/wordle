@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import {onBeforeMount, ref, Ref} from 'vue'
+
 const userWords: Ref<string[]> = ref([])
 const solutionWord: Ref<string[]> = ref([])
+const validWords: Ref<string[]> = ref([])
 
+// Load the list of solutions from the txt file and choose a random one
 onBeforeMount( async () => {
   const response = await fetch('wordles.txt');
   const text = await response.text();
@@ -11,18 +14,24 @@ onBeforeMount( async () => {
   solutionWord.value.push(randomWord)
 })
 
-function addOneWord() {
-  userWords.value.push("Hi")
-}
+// Load the list of valid words from the txt file
+onBeforeMount( async () => {
+  const response = await fetch('guesses.txt');
+  const text = await response.text();
+  validWords.value = text.split('\n').filter(word => word.trim() !== '')
+  console.log(validWords.value)
+})
 
-function clearAll() {
-  userWords.value.splice(0)
+function addOneWord(word: string) {
+  // Add a word to the list of user words if it is valid and has 5 letters
+  if (validWords.value.includes(word) && word.length === 5) {
+      userWords.value.push(word)
+    }
 }
 
 function newGame() {
-//
+  window.location.reload();
 }
-
 function check(){
   //Check & display guess
   //Clear current word in input field
@@ -30,7 +39,6 @@ function check(){
   //Display "Congratulations" if guess it correct
   //Display "Game over" if run out of guesses
 }
-
 
 </script>
 
@@ -45,9 +53,9 @@ function check(){
   <ul>
     
     <label for="guess">Next word: </label>
-    <input type="text" id="guess">
+    <input type="text" id="guess" v-model="wordInput">
+    <button @click="addOneWord(wordInput)" class="button">Add Word</button>
     <br>
-
     <button @click="newGame" class="button">New Game</button>
     <button @click="check" class="button">Check</button>
     <li v-for="(w, pos) in userWords" v-bind:key="pos">{{ w }}</li>
