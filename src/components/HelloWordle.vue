@@ -78,7 +78,7 @@ function disableSubmit(){
 function CheckForWin(word: string) {
   const stringSolution=solutionWord.value.join("");
   // Check if the latest word is the same as the solution word
-  if (solutionWord.value.join('') === (word)) {
+  if (solutionWord.value.join() === (word)) {
     alert('Congratulations, you win!');
     disableSubmit();
   }
@@ -105,7 +105,18 @@ function CheckForWin(word: string) {
     <button @click="newGame" class="button">New Game</button>
     <br>
     <button @click="displaySecretWord" class="button" >Tell me the answer!</button>
-    <h2 id="answer" class="idk"></h2>
+    <h2 id="answer"></h2>
+    <h2 id="report">Brief Report:</h2>
+    <p>In order to build the grid of letters in Vue3 we created a 
+      div containing 30 divs inside it. The 30 divs are created
+      by using <code>v-for</code>. Then, in our <code>displayWord()</code> function, we 
+      displayed each letter first by using <code>.split()</code> to turn the guessed word
+      into an array of letters. Then, we looped through each letter of the 
+      secret word and used <code>if</code> statements to check if each letter 
+      of the guessed word matched. At the same time, we
+      displayed each letter in the divs, and added class names based on the 
+      accuracy of each letter.
+    </p>
   </ul>
 
 </template>
