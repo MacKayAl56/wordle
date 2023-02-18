@@ -20,7 +20,8 @@ onBeforeMount( async () => {
 onBeforeMount( async () => {
   const response = await fetch('guesses.txt');
   const text = await response.text();
-  validWords.value = text.split('\n').filter(word => word.trim() !== '')
+  const wordsArray = text.split('\n');
+  validWords.value = wordsArray
 })
 
 function displaySecretWord(){
@@ -31,16 +32,18 @@ function displaySecretWord(){
 
 function addOneWord(word: string) {
   // Add a word to the list of user words if it is valid, has 5 letters, and hasn't been guessed before
-  if (validWords.value.includes(word) && word.length == 5 && userWords.value.includes(word) == false) {
+  if (word.length == 5 && !userWords.value.includes(word) && validWords.value.includes(word)) {
     userWords.value.push(word)
+    displayWord(word);
+  }
+  else {
+    console.log(validWords.value)
+    alert('Invalid word. Please try again.')
   }
   //Clear input field
   const empty = "";
   var input = document.getElementById("guess");
   input.value = empty;
-  // Display the word in the grid
-  displayWord(word);
-  
 }
 
 function newGame() {
@@ -135,6 +138,7 @@ function CheckForWin(word: string) {
     outline-color: lightgray;
     font-size: xx-large;
     padding-top: 10%;
+    font-weight: bold;
   }
 
   .button{
