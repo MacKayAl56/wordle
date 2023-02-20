@@ -11,6 +11,8 @@ onBeforeMount( async () => {
   const response = await fetch('wordles.txt');
   const text = await response.text();
   const wordsArray = text.split('\n').filter(word => word.trim() !== '');
+
+  // Choose a random word from the list and add it to solutionWord
   const randomWord = wordsArray[Math.floor(Math.random() * wordsArray.length)];
   solutionWord.value.push(randomWord)
   console.log(solutionWord.value)
@@ -24,6 +26,7 @@ onBeforeMount( async () => {
   validWords.value = wordsArray
 })
 
+// Display the secret word when the user clicks the button
 function displaySecretWord(){
   const par = document.getElementById("answer");
   par.innerText = "The answer is: " + solutionWord.value;
@@ -51,10 +54,12 @@ function newGame() {
 }
 
 function displayWord(word: string) {
-  // Display the word in the grid
   const letters = word.split('')
   for (let i = 0; i < letters.length; i++) {
+
+    // Display the word in the grid
     document.getElementsByClassName('box')[lettersGuessed.value + i].innerHTML = letters[i].toUpperCase();
+
     // if letter is in the solution word at the same position, add class "perfect"
     if (solutionWord.value[0].charAt(i) === letters[i]) {
       document.getElementsByClassName('box')[lettersGuessed.value + i].classList.add('perfect')
@@ -68,7 +73,7 @@ function displayWord(word: string) {
       document.getElementsByClassName('box')[lettersGuessed.value + i].classList.add('wrong')
     }
   }
-  // Add 5 to lettersGuessed
+  // Add 5 to lettersGuessed to move to the next row
   lettersGuessed.value += 5
   CheckForWin(word)
 }
@@ -85,7 +90,8 @@ function CheckForWin(word: string) {
     alert('Congratulations, you win!');
     disableSubmit();
   }
-  if(lettersGuessed.value == 30){
+  // If the user has guessed 6 words, they lose
+  else if(lettersGuessed.value == 30){
     alert('You lose. The answer was: '+ solutionWord.value);
     disableSubmit();
     newGame();
@@ -100,27 +106,18 @@ function CheckForWin(word: string) {
     <div class="box" v-for="index in 30"></div>
   </div>
 
-  <ul>
-    <label for="guess">Next word: </label>
-    <input type="text" id="guess" v-model="wordInput">
+  <div>
     <br>
-    <button @click="addOneWord(wordInput)" class="button" id="submit">Submit</button>
+    <input @keypress.enter="addOneWord(wordInput)" type="text" id="guess" placeholder="Click enter to submit word" v-model="wordInput">
+    <button @click="addOneWord(wordInput)" class="button button1" id="submit">Submit</button>
+  </div>
+
+  <div>
     <button @click="newGame" class="button">New Game</button>
     <br>
     <button @click="displaySecretWord" class="button" >Tell me the answer!</button>
     <h2 id="answer"></h2>
-    <h2 id="report">Brief Report:</h2>
-    <p>In order to build the grid of letters in Vue3 we created a 
-      div containing 30 divs inside it. The 30 divs are created
-      by using <code>v-for</code>. Then, in our <code>displayWord()</code> function, we 
-      displayed each letter first by using <code>.split()</code> to turn the guessed word
-      into an array of letters. Then, we looped through each letter of the 
-      secret word and used <code>if</code> statements to check if each letter 
-      of the guessed word matched. At the same time, we
-      displayed each letter in the divs, and added class names based on the 
-      accuracy of each letter.
-    </p>
-  </ul>
+  </div>
 
 </template>
 
@@ -133,12 +130,24 @@ function CheckForWin(word: string) {
     grid-row-gap: 10px;
   }
 
+  input[type=text] {
+    padding:10px;
+    border:0;
+    background-color: gray;
+    border-radius:10px;
+    margin-right: 10px;
+    box-shadow:0 0 5px 2px rgba(255, 255, 255, 0.2);
+  }
+  ::placeholder {
+    color: white;
+  }
+
   .box{
-    outline-style: solid;
-    outline-color: lightgray;
-    font-size: xx-large;
+    outline: #3A3A3C solid 2px;
+    font-size: 32px;
     padding-top: 10%;
     font-weight: bold;
+    font-family: Arial, sans-serif;
   }
 
   .button{
@@ -150,18 +159,21 @@ function CheckForWin(word: string) {
   }
 
   .perfect{
-    background-color: green;
-    color: black;
+    background-color: #538d4e;
+    color: white;
+    outline-color: #538d4e;
   }
 
   .misplaced{
-    background-color: yellow;
-    color: black;
+    background-color: #b59f3b;
+    color: white;
+    outline-color: #b59f3b;
   }
 
   .wrong{
-    background-color:gray;
-    color: black;
+    background-color:#3A3A3C;
+    color: white;
+    outline-color: #3A3A3C;
   }
 
 
