@@ -5,6 +5,7 @@ const userWords: Ref<string[]> = ref([])
 const solutionWord: Ref<string[]> = ref([])
 const validWords: Ref<string[]> = ref([])
 const lettersGuessed: Ref<number> = ref(0)
+const typedLetters: Ref<number> = ref(0)
 
 // Load the list of solutions from the txt file and choose a random one
 onBeforeMount( async () => {
@@ -32,7 +33,6 @@ function displaySecretWord(){
   par.innerText = "The answer is: " + solutionWord.value;
 }
 
-
 function addOneWord(word: string) {
   // Add a word to the list of user words if it is valid, has 5 letters, and hasn't been guessed before
   if (word.length == 5 && !userWords.value.includes(word) && validWords.value.includes(word)) {
@@ -55,6 +55,8 @@ function newGame() {
 }
 
 function displayWord(word: string) {
+  lettersGuessed.value -= 5
+  typedLetters.value = 0
   const letters = word.split('')
   for (let i = 0; i < letters.length; i++) {
 
@@ -78,6 +80,24 @@ function displayWord(word: string) {
   lettersGuessed.value += 5
 }
 
+function displayLetter(letter: string) {
+  // only display the letter if it is in the alphabet, and we have not typed more than 5 letters
+  if (letter.match(/[a-z]/i) && typedLetters.value < 5) {
+    document.getElementsByClassName('box')[lettersGuessed.value].innerHTML = letter.toUpperCase();
+    typedLetters.value += 1
+    lettersGuessed.value += 1
+  }
+}
+
+function removeLastLetter() {
+  // Remove the last letter from the grid and decrement the counters
+  document.getElementsByClassName('box')[lettersGuessed.value].innerHTML = "";
+  if (typedLetters.value > 0) {
+    typedLetters.value -= 1
+    lettersGuessed.value -= 1
+  }
+}
+
 function disableSubmit(){
     const submitButton = <HTMLButtonElement> document.getElementById("submit");
     submitButton.setAttribute("disabled","true");
@@ -96,10 +116,10 @@ function CheckForWin(word: string) {
     newGame();
   }
 }
-
 </script>
 
 <template>
+  <div>
   <p>By: Kyle Smigelski and Alexandra MacKay</p>
   <div id="display" class="grid">
     <div class="box" v-for="index in 30"></div>
@@ -107,7 +127,12 @@ function CheckForWin(word: string) {
 
   <div>
     <br>
-    <input @keypress.enter="addOneWord(wordInput)" type="text" id="guess" placeholder="Click enter to submit word" v-model="wordInput">
+    <input @keypress.enter="addOneWord(wordInput)"
+           @keydown.delete="removeLastLetter()"
+           @keydown.backspace="removeLastLetter()"
+           @keyup="displayLetter($event.target.value.slice(-1))"
+           type="text" id="guess" placeholder="Type your guess slowly and hit enter" v-model="wordInput">
+<!--    <input @keypress.enter="addOneWord(wordInput)" type="text" id="guess" placeholder="Click enter to submit word" v-model="wordInput">-->
     <button @click="addOneWord(wordInput)" class="button button1" id="submit">Submit</button>
   </div>
 
@@ -117,6 +142,7 @@ function CheckForWin(word: string) {
     <h2 id="answer"></h2>
   </div>
 
+  </div>
 </template>
 
 <style scoped>
@@ -130,6 +156,7 @@ function CheckForWin(word: string) {
 
   input[type=text] {
     padding:10px;
+    width: 250px;
     border:0;
     background-color: gray;
     border-radius:10px;

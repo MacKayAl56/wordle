@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import HelloWordle from './components/HelloWordle.vue'
+import Keyboard from "./components/keyboard.vue";
 </script>
 
 <template>
@@ -14,9 +15,12 @@ import HelloWordle from './components/HelloWordle.vue'
     secret word and used <code>if</code> statements to check if each letter
     of the guessed word matched. At the same time, we
     displayed each letter in the divs, and added class names based on the
-    accuracy of each letter. We also used <code>onBeforeMount</code> and <code>await</code> to import text files
+    accuracy of each letter.
+  </p>
+  <p style="width: 700px">
+    We also used <code>onBeforeMount</code> and <code>await</code> to import text files
     containing the official list of words and the list of valid words, which we used to validate input and
-    get a random solution word (potential extra credit?).
+    get a random solution word. The grid updates as you type - as long as you don't type too fast!
   </p>
 </template>
 
