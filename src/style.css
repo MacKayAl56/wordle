@@ -24,15 +24,21 @@ a:hover {
 
 body {
   margin: 0;
+  padding: 0;
   display: flex;
   place-items: center;
   min-width: 320px;
-  min-height: 100vh;
+  width: 100%;
+  max-width: 1980px;
+  min-height: 100%;
+  justify-content: stretch;
+  align-items: stretch;
 }
 
 h1 {
-  font-size: 3.2em;
+  font-size: 2.2em;
   line-height: 1.1;
+  padding: 0;
 }
 
 button {
@@ -57,14 +63,9 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-.card {
-  padding: 2em;
-}
-
 #app {
-  max-width: 2280px;
-  margin: 0 auto;
-  text-align: center;
+  height: inherit;
+  width: inherit;
 }
 
 @media (prefers-color-scheme: light) {

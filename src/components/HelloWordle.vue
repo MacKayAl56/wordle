@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import {onBeforeMount, ref, Ref} from 'vue'
+import {onBeforeMount, onUnmounted, ref, Ref, watch} from 'vue'
+import Keyboard from "./keyboard.vue";
 
 const userWords: Ref<string[]> = ref([])
 const solutionWord: Ref<string[]> = ref([])
 const validWords: Ref<string[]> = ref([])
 const lettersGuessed: Ref<number> = ref(0)
-const typedLetters: Ref<number> = ref(0)
+const typedLetters: Ref<string[]> = ref([])
+const letterColors: Ref<Record<string, string>> = ref({})
+
 
 // Load the list of solutions from the txt file and choose a random one
 onBeforeMount( async () => {
@@ -33,7 +36,9 @@ function displaySecretWord(){
   par.innerText = "The answer is: " + solutionWord.value;
 }
 
-function addOneWord(word: string) {
+function addOneWord() {
+  // Convert lettersGuessed to a string
+  const word = typedLetters.value.join('')
   // Add a word to the list of user words if it is valid, has 5 letters, and hasn't been guessed before
   if (word.length == 5 && !userWords.value.includes(word) && validWords.value.includes(word)) {
     userWords.value.push(word)
@@ -56,35 +61,40 @@ function newGame() {
 
 function displayWord(word: string) {
   lettersGuessed.value -= 5
-  typedLetters.value = 0
+  typedLetters.value = []
   const letters = word.split('')
   for (let i = 0; i < letters.length; i++) {
 
     // Display the word in the grid
     document.getElementsByClassName('box')[lettersGuessed.value + i].innerHTML = letters[i].toUpperCase();
 
+    // Add the corresponding class to the letter.
     // if letter is in the solution word at the same position, add class "perfect"
     if (solutionWord.value[0].charAt(i) === letters[i]) {
       document.getElementsByClassName('box')[lettersGuessed.value + i].classList.add('perfect')
+      letterColors.value[letters[i]] = '#538d4e'
     }
     // if letter is in the solution word at a different position, add class "misplaced"
     else if (solutionWord.value[0].includes(letters[i])) {
       document.getElementsByClassName('box')[lettersGuessed.value + i].classList.add('misplaced')
+      letterColors.value[letters[i]] = '#b59f3b'
     }
     // if letter is not in the solution word, add class "wrong" and make letter appear
     else {
       document.getElementsByClassName('box')[lettersGuessed.value + i].classList.add('wrong')
+      letterColors.value[letters[i]] = '#3A3A3C'
     }
   }
   // Add 5 to lettersGuessed to move to the next row
   lettersGuessed.value += 5
 }
 
+
 function displayLetter(letter: string) {
   // only display the letter if it is in the alphabet, and we have not typed more than 5 letters
-  if (letter.match(/[a-z]/i) && typedLetters.value < 5) {
+  if (letter.match(/[a-z]/i) && typedLetters.value.length < 5) {
     document.getElementsByClassName('box')[lettersGuessed.value].innerHTML = letter.toUpperCase();
-    typedLetters.value += 1
+    typedLetters.value.push(letter)
     lettersGuessed.value += 1
   }
 }
@@ -92,56 +102,71 @@ function displayLetter(letter: string) {
 function removeLastLetter() {
   // Remove the last letter from the grid and decrement the counters
   document.getElementsByClassName('box')[lettersGuessed.value].innerHTML = "";
-  if (typedLetters.value > 0) {
-    typedLetters.value -= 1
+  if (typedLetters.value.length > 0) {
+    typedLetters.value.pop()
     lettersGuessed.value -= 1
   }
 }
 
-function disableSubmit(){
-    const submitButton = <HTMLButtonElement> document.getElementById("submit");
-    submitButton.setAttribute("disabled","true");
+function disableInput() {
+  // Disable the input field
+  const input = document.getElementById("guess");
+  input.disabled = true;
 }
 
 function CheckForWin(word: string) {
-  // Check if the latest word is the same as the solution word
+  // Check if the latest word is the same as the solution word. If so, the user wins and they can't submit any more words or letters
   if (solutionWord.value.join() === (word)) {
     alert('Congratulations, you win!');
-    disableSubmit();
+    disableInput();
   }
   // If the user has guessed 6 words, they lose
   else if(lettersGuessed.value == 30){
     alert('You lose. The answer was: '+ solutionWord.value);
-    disableSubmit();
-    newGame();
+    disableInput();
   }
 }
+
+let allowInput = true
+const onKeyup = (e: KeyboardEvent) => onPress(e.key)
+window.addEventListener('keyup', onKeyup)
+function onPress(key: string) {
+  if (!allowInput) return
+  if (/^[a-zA-Z]$/.test(key)) {
+    displayLetter(key)
+  } else if (key === 'Backspace' || key === 'Delete') {
+    removeLastLetter()
+  } else if (key === 'Enter') {
+    addOneWord()
+  }
+}
+
 </script>
 
 <template>
-  <div>
-  <p>By: Kyle Smigelski and Alexandra MacKay</p>
-  <div id="display" class="grid">
-    <div class="box" v-for="index in 30"></div>
+  <div class="header">
+    <p class="div1" style="padding-top: 20px">By: Kyle Smigelski and Alexandra MacKay</p>
+    <h1 class="div2" id="title">Wordle Clone</h1>
+    <button class="div3" @click="displaySecretWord" >Tell me the answer!</button>
+    <button class="div4" @click="newGame" >New Game</button>
+  </div>
+  <hr style="margin-bottom: 20px">
+
+  <div class="field">
+    <div class="grid">
+      <div class="box" v-for="index in 30"></div>
+    </div>
   </div>
 
-  <div>
-    <br>
-    <input @keypress.enter="addOneWord(wordInput)"
-           @keydown.delete="removeLastLetter()"
-           @keydown.backspace="removeLastLetter()"
-           @keyup="displayLetter($event.target.value.slice(-1))"
-           type="text" id="guess" placeholder="Type your guess slowly and hit enter" v-model="wordInput">
-<!--    <input @keypress.enter="addOneWord(wordInput)" type="text" id="guess" placeholder="Click enter to submit word" v-model="wordInput">-->
-    <button @click="addOneWord(wordInput)" class="button button1" id="submit">Submit</button>
-  </div>
 
-  <div>
-    <button @click="newGame" class="button">New Game</button>
-    <button @click="displaySecretWord" class="button" >Tell me the answer!</button>
+  <div style="justify-content: center">
     <h2 id="answer"></h2>
+    <keyboard :letterColors="letterColors" />
   </div>
-
+  <br>
+  <div class="field">
+  <input @keypress.enter="addOneWord()"
+         type="text" id="guess" placeholder="Optional Text Field" v-model="wordInput">
   </div>
 </template>
 
@@ -154,6 +179,38 @@ function CheckForWin(word: string) {
     grid-row-gap: 10px;
   }
 
+  .header {
+    display: grid;
+    grid-area: header;
+    justify-content: space-evenly;
+    justify-items: center;
+    align-content: space-evenly;
+    align-items: center;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: 60px;
+  }
+  .div1 { grid-area: 1 / 1 / 2 / 2; }
+  .div2 { grid-area: 1 / 3 / 2 / 4; }
+  .div3 { grid-area: 1 / 4 / 2 / 5;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    margin-left: 100px;
+  }
+  .div4 { grid-area: 1 / 5 / 2 / 6;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    margin-right: 100px;
+  }
+
+  .field {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    margin-bottom: 25px;
+  }
+
   input[type=text] {
     padding:10px;
     width: 250px;
@@ -164,7 +221,7 @@ function CheckForWin(word: string) {
     box-shadow:0 0 5px 2px rgba(255, 255, 255, 0.2);
   }
   ::placeholder {
-    color: white;
+    color: black;
   }
 
   .box{
@@ -172,15 +229,19 @@ function CheckForWin(word: string) {
     font-size: 32px;
     padding-top: 10%;
     font-weight: bold;
+    text-align: center;
     font-family: Arial, sans-serif;
   }
 
-  .button{
+  .button1{
     outline-style: solid;
     outline-color: black;
-    margin-top: 10px;
-    margin-right: 20px;
-    font-size: medium;
+    height: 40px;
+    width: 200px;
+    margin-top: auto;
+    justify-content: center;
+    align-items: center;
+    font-size: small;
   }
 
   .perfect{
