@@ -38,6 +38,7 @@ function addOneWord(word: string) {
   if (word.length == 5 && !userWords.value.includes(word) && validWords.value.includes(word)) {
     userWords.value.push(word)
     displayWord(word);
+    CheckForWin(word);
   }
   else {
     console.log(validWords.value)
@@ -75,7 +76,6 @@ function displayWord(word: string) {
   }
   // Add 5 to lettersGuessed to move to the next row
   lettersGuessed.value += 5
-  CheckForWin(word)
 }
 
 function disableSubmit(){
@@ -84,7 +84,6 @@ function disableSubmit(){
 }
 
 function CheckForWin(word: string) {
-  const stringSolution=solutionWord.value.join("");
   // Check if the latest word is the same as the solution word
   if (solutionWord.value.join() === (word)) {
     alert('Congratulations, you win!');
@@ -114,7 +113,6 @@ function CheckForWin(word: string) {
 
   <div>
     <button @click="newGame" class="button">New Game</button>
-    <br>
     <button @click="displaySecretWord" class="button" >Tell me the answer!</button>
     <h2 id="answer"></h2>
   </div>
