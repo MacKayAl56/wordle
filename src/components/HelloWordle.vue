@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {onBeforeMount, onUnmounted, ref, Ref, watch} from 'vue'
 import Keyboard from "./keyboard.vue";
+import '@fontsource/anton';
 
 const userWords: Ref<string[]> = ref([])
 const solutionWord: Ref<string[]> = ref([])
@@ -8,7 +9,6 @@ const validWords: Ref<string[]> = ref([])
 const lettersGuessed: Ref<number> = ref(0)
 const typedLetters: Ref<string[]> = ref([])
 const letterColors: Ref<Record<string, string>> = ref({})
-
 
 // Load the list of solutions from the txt file and choose a random one
 onBeforeMount( async () => {
@@ -30,12 +30,6 @@ onBeforeMount( async () => {
   validWords.value = wordsArray
 })
 
-// Display the secret word when the user clicks the button
-function displaySecretWord(){
-  const par = document.getElementById("answer");
-  par.innerText = "The answer is: " + solutionWord.value;
-}
-
 function addOneWord() {
   // Convert lettersGuessed to a string
   const word = typedLetters.value.join('')
@@ -46,13 +40,13 @@ function addOneWord() {
     CheckForWin(word);
   }
   else {
-    console.log(validWords.value)
-    alert('Invalid word. Please try again.')
+    shake();
   }
-  //Clear input field
-  const empty = "";
-  var input = document.getElementById("guess");
-  input.value = empty;
+}
+
+//click title to display solution
+function displaySolution() {
+  document.getElementById("title")!.innerHTML = solutionWord.value[0];
 }
 
 function newGame() {
@@ -62,31 +56,27 @@ function newGame() {
 function displayWord(word: string) {
   lettersGuessed.value -= 5
   typedLetters.value = []
+  const colors = []
   const letters = word.split('')
   for (let i = 0; i < letters.length; i++) {
 
-    // Display the word in the grid
-    document.getElementsByClassName('box')[lettersGuessed.value + i].innerHTML = letters[i].toUpperCase();
-
-    // Add the corresponding class to the letter.
     // if letter is in the solution word at the same position, add class "perfect"
     if (solutionWord.value[0].charAt(i) === letters[i]) {
-      document.getElementsByClassName('box')[lettersGuessed.value + i].classList.add('perfect')
+      //document.getElementsByClassName('box')[lettersGuessed.value + i].classList.add('perfect')
       letterColors.value[letters[i]] = '#538d4e'
     }
     // if letter is in the solution word at a different position, add class "misplaced"
     else if (solutionWord.value[0].includes(letters[i])) {
-      document.getElementsByClassName('box')[lettersGuessed.value + i].classList.add('misplaced')
       letterColors.value[letters[i]] = '#b59f3b'
     }
     // if letter is not in the solution word, add class "wrong" and make letter appear
     else {
-      document.getElementsByClassName('box')[lettersGuessed.value + i].classList.add('wrong')
       letterColors.value[letters[i]] = '#3A3A3C'
     }
   }
   // Add 5 to lettersGuessed to move to the next row
   lettersGuessed.value += 5
+  flip(letters);
 }
 
 
@@ -96,34 +86,31 @@ function displayLetter(letter: string) {
     document.getElementsByClassName('box')[lettersGuessed.value].innerHTML = letter.toUpperCase();
     typedLetters.value.push(letter)
     lettersGuessed.value += 1
+    pop();
   }
 }
 
 function removeLastLetter() {
-  // Remove the last letter from the grid and decrement the counters
-  document.getElementsByClassName('box')[lettersGuessed.value].innerHTML = "";
+  // Remove the last letter from the input field
   if (typedLetters.value.length > 0) {
+    document.getElementsByClassName('box')[lettersGuessed.value - 1].innerHTML = '';
     typedLetters.value.pop()
     lettersGuessed.value -= 1
   }
 }
 
-function disableInput() {
-  // Disable the input field
-  const input = document.getElementById("guess");
-  input.disabled = true;
-}
-
 function CheckForWin(word: string) {
   // Check if the latest word is the same as the solution word. If so, the user wins and they can't submit any more words or letters
   if (solutionWord.value.join() === (word)) {
-    alert('Congratulations, you win!');
-    disableInput();
+    allowInput = false
+    // Change the color of the newgame button to green
+    document.getElementById("newgame")!.style.backgroundColor = "#538d4e";
+    winner();
   }
   // If the user has guessed 6 words, they lose
   else if(lettersGuessed.value == 30){
     alert('You lose. The answer was: '+ solutionWord.value);
-    disableInput();
+    allowInput = false
   }
 }
 
@@ -141,32 +128,57 @@ function onPress(key: string) {
   }
 }
 
+function shake() {
+  document.getElementsByClassName('grid')[0].classList.add('shake')
+  setTimeout(() => {
+    document.getElementsByClassName('grid')[0].classList.remove('shake')
+  }, 300)
+}
+
+function flip(letters: string[]) {
+  for (let i = 0; i < 5; i++) {
+    setTimeout(() => {
+      document.getElementsByClassName('box')[lettersGuessed.value - 5 + i].classList.add('flip')
+      document.getElementsByClassName('box')[lettersGuessed.value - 5 + i].style.backgroundColor = letterColors.value[letters[i]]
+      document.getElementsByClassName('box')[lettersGuessed.value - 5 + i].style.outlineColor = letterColors.value[letters[i]]
+    }, 350 * i)
+  }
+}
+
+function pop() {
+  // Pop the current letter
+  document.getElementsByClassName('box')[lettersGuessed.value - 1].classList.add('pop')
+  // Remove the pop class after 350ms
+  setTimeout(() => {
+    document.getElementsByClassName('box')[lettersGuessed.value - 1].classList.remove('pop')
+  }, 300)
+}
+
+function winner() {
+  for (let i = 0; i < 5; i++) {
+    setTimeout(() => {
+      document.getElementsByClassName('box')[lettersGuessed.value - 5 + i].classList.add('skip')
+    }, 330 * i)
+  }
+}
+
 </script>
 
 <template>
   <div class="header">
-    <p class="div1" style="padding-top: 20px">By: Kyle Smigelski and Alexandra MacKay</p>
-    <h1 class="div2" id="title">Wordle Clone</h1>
-    <button class="div3" @click="displaySecretWord" >Tell me the answer!</button>
-    <button class="div4" @click="newGame" >New Game</button>
+    <h1 @click="displaySolution" class="title" id="title" style="font-family: Anton,serif">Wordle Clone</h1>
+    <button class="new-Button" @click="newGame" id="newgame" >New Game</button>
   </div>
-  <hr style="margin-bottom: 20px">
 
   <div class="field">
     <div class="grid">
-      <div class="box" v-for="index in 30"></div>
+      <div class="box" id="letter-boxes" v-for="index in 30"></div>
     </div>
   </div>
 
-
   <div style="justify-content: center">
-    <h2 id="answer"></h2>
-    <keyboard :letterColors="letterColors" />
-  </div>
-  <br>
-  <div class="field">
-  <input @keypress.enter="addOneWord()"
-         type="text" id="guess" placeholder="Optional Text Field" v-model="wordInput">
+
+    <keyboard @key="onPress" :letterColors="letterColors" :key="onPress"/>
   </div>
 </template>
 
@@ -188,27 +200,25 @@ function onPress(key: string) {
     align-items: center;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: 60px;
+    border-bottom: #3a3a3c 1px solid;
+    margin-bottom: 60px;
   }
-  .div1 { grid-area: 1 / 1 / 2 / 2; }
-  .div2 { grid-area: 1 / 3 / 2 / 4; }
-  .div3 { grid-area: 1 / 4 / 2 / 5;
+
+  .title { grid-area: 1 / 3 / 2 / 4;
+    margin-top: 30px;
+  }
+  .new-Button { grid-area: 1 / 5 / 2 / 6;
     justify-content: center;
     align-items: center;
-    margin-top: 10px;
-    margin-left: 100px;
-  }
-  .div4 { grid-area: 1 / 5 / 2 / 6;
-    justify-content: center;
-    align-items: center;
-    margin-top: 10px;
     margin-right: 100px;
+    color: white;
   }
 
   .field {
     justify-content: center;
     align-items: center;
     display: flex;
-    margin-bottom: 25px;
+    margin-bottom: 60px;
   }
 
   input[type=text] {
@@ -224,6 +234,10 @@ function onPress(key: string) {
     color: black;
   }
 
+  hr {
+    margin-bottom: 20px;
+  }
+
   .box{
     outline: #3A3A3C solid 2px;
     font-size: 32px;
@@ -232,16 +246,24 @@ function onPress(key: string) {
     text-align: center;
     font-family: Arial, sans-serif;
   }
-
-  .button1{
-    outline-style: solid;
-    outline-color: black;
-    height: 40px;
-    width: 200px;
-    margin-top: auto;
-    justify-content: center;
-    align-items: center;
-    font-size: small;
+  .front, .back{
+    backface-visibility: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .front{
+    z-index: 2;
+    transform: rotateX(0deg);
+  }
+  .back{
+    transform: rotateX(180deg);
+  }
+  .flip{
+    transform: rotateX(180deg) scale(1, -1);
+    transition: 0.5s;
+    transform-style: preserve-3d;
+    position: relative;
   }
 
   .perfect{
@@ -260,6 +282,106 @@ function onPress(key: string) {
     background-color:#3A3A3C;
     color: white;
     outline-color: #3A3A3C;
+  }
+
+  .shake {
+    animation: shake 0.7s;
+  }
+  @keyframes shake {
+    0% {
+      transform: translate(1px);
+    }
+    10% {
+      transform: translate(-2px);
+    }
+    20% {
+      transform: translate(2px);
+    }
+    30% {
+      transform: translate(-2px);
+    }
+    40% {
+      transform: translate(2px);
+    }
+    50% {
+      transform: translate(-2px);
+    }
+    60% {
+      transform: translate(2px);
+    }
+    70% {
+      transform: translate(-2px);
+    }
+    80% {
+      transform: translate(2px);
+    }
+    90% {
+      transform: translate(-2px);
+    }
+    100% {
+      transform: translate(1px);
+    }
+  }
+
+  .pop {
+    animation: pop 0.3s;
+  }
+  @keyframes pop {
+    0% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .skip {
+    animation: skip 0.7s;
+  }
+  @keyframes skip {
+    0% {
+      transform: translateY(0px);
+    }
+    20% {
+      transform: translateY(5px);
+    }
+    60% {
+      transform: translateY(-25px);
+    }
+    90% {
+      transform: translateY(3px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  @media (max-width: 920px) {
+    h1 {
+      font-size: 1.5rem;
+    }
+    .title { grid-area: 1 / 3 / 2 / 4;
+      width: 150px;
+      font-size: x-large;
+      margin-top: 20px;
+    }
+    .new-Button { grid-area: 1 / 5 / 2 / 6;
+      height: 30px;
+      width: 100px;
+      font-size: small;
+      margin-right: 50px;
+      padding: 0;
+    }
+    .field {
+      justify-content: center;
+      align-items: center;
+      display: flex;
+      margin-bottom: 15px;
+    }
+    .header {
+      grid-template-rows: 48px;
+      margin-bottom: 15px;
+    }
   }
 
 
