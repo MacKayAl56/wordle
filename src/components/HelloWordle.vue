@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import {onBeforeMount, onUnmounted, ref, Ref, watch} from 'vue'
 import Keyboard from "./keyboard.vue";
+import Login from "./login.vue";
+import Register from "./register.vue";
 import '@fontsource/anton';
 
 const userWords: Ref<string[]> = ref([])
@@ -9,6 +11,8 @@ const validWords: Ref<string[]> = ref([])
 const lettersGuessed: Ref<number> = ref(0)
 const typedLetters: Ref<string[]> = ref([])
 const letterColors: Ref<Record<string, string>> = ref({})
+let showModal: Ref<boolean> = ref(false)
+let showModalRegister: Ref<boolean> = ref(false)
 
 // Load the list of solutions from the txt file and choose a random one
 onBeforeMount( async () => {
@@ -162,12 +166,31 @@ function winner() {
   }
 }
 
+// Show the login modal by setting showModal in the login modal component to true using refs
+function showLoginModal() {
+  showModal.value = true
+  allowInput = false
+}
+
+function showRegisterModal() {
+  showModalRegister.value = true
+  allowInput = false
+}
+
 </script>
 
 <template>
   <div class="header">
     <h1 @click="displaySolution" class="title" id="title" style="font-family: Anton,serif">Wordle Clone</h1>
-    <button class="new-Button" @click="newGame" id="newgame" >New Game</button>
+    <button class="nav-button" @click="newGame" id="newgame" >New Game</button>
+    <button class="nav-button login"  @click="showLoginModal" >Log in</button>
+    <div v-show="showModal" @close="showModal = false">
+      <login :show-modal="showModal" @close="showModal = false"></login>
+    </div>
+    <div v-show="showModalRegister" @close="showModalRegister = false">
+      <register :show-modal-register="showModalRegister" @close="showModalRegister = false"></register>
+    </div>
+    <button class="nav-button register" @click="showRegisterModal">Register</button>
   </div>
 
   <div class="field">
@@ -207,12 +230,19 @@ function winner() {
   .title { grid-area: 1 / 3 / 2 / 4;
     margin-top: 30px;
   }
-  .new-Button { grid-area: 1 / 5 / 2 / 6;
+  .nav-button { grid-area: 1 / 0 / 2 / 6;
     justify-content: center;
     align-items: center;
     margin-right: 100px;
     color: white;
   }
+  .nav-button:hover {
+    background-color: #538d4e;
+  }
+
+  .nav-button.login { grid-area: 1 / 4 / 2 / 6; }
+
+  .nav-button.register { grid-area: 1 / 5 / 2 / 6; }
 
   .field {
     justify-content: center;
@@ -365,7 +395,7 @@ function winner() {
       font-size: x-large;
       margin-top: 20px;
     }
-    .new-Button { grid-area: 1 / 5 / 2 / 6;
+    .nav-button { grid-area: 1 / 0 / 2 / 6;
       height: 30px;
       width: 100px;
       font-size: small;
