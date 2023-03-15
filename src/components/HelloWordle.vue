@@ -183,6 +183,9 @@ function showRegisterModal() {
   <div class="header">
     <h1 @click="displaySolution" class="title" id="title" style="font-family: Anton,serif">Wordle Clone</h1>
     <button class="nav-button" @click="newGame" id="newgame" >New Game</button>
+
+    
+
     <button class="nav-button login"  @click="showLoginModal" >Log in</button>
     <div v-show="showModal" @close="showModal = false">
       <login :show-modal="showModal" @close="showModal = false"></login>

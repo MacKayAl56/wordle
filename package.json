@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@fontsource/anton": "^4.5.9",
+    "firebase": "^9.17.2",
     "vue": "^3.2.45"
   },
   "devDependencies": {

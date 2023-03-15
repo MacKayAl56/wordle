@@ -10,7 +10,7 @@
         <label for="password">Password</label>
         <input type="password" id="password" v-model="password" required>
       </div>
-      <button type="submit">Submit</button>
+      <button type="submit" @click="createAccount">Submit</button>
       <button type="button" @click="closeModal">Cancel</button>
     </form>
   </div>
@@ -18,6 +18,33 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import {getFirestore, Firestore} from "firebase/firestore";
+import { getAnalytics } from "firebase/analytics";
+import { getAuth, connectAuthEmulator, signInWithEmailAndPassword, createUserWithEmailAndPassword, UserCredential, sendEmailVerification } from 'firebase/auth';
+import { connect } from 'http2';
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCQm1cPSv2TByJ7qmwTuRWMPhNj6aKZl7Y",
+  authDomain: "wordle-5db5b.firebaseapp.com",
+  projectId: "wordle-5db5b",
+  storageBucket: "wordle-5db5b.appspot.com",
+  messagingSenderId: "835958338222",
+  appId: "1:835958338222:web:16ad75f9dcf40ad0f9733f",
+  measurementId: "G-84HV2KBLWL"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db:Firestore = getFirestore(app);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+//connectAuthEmulator(auth,"http:localhost:5173");
 
 export default defineComponent({
   props: {
@@ -35,7 +62,26 @@ export default defineComponent({
   methods: {
     closeModal() {
       this.$emit('close');
-    }
+    },
+    createAccount():void {
+      //this.username = username;
+      //this.password = password;
+      
+      const newEmail = this.username;
+      const newPassword = this.password;
+
+      createUserWithEmailAndPassword(auth, newEmail, newPassword)
+        .then((cred:UserCredential)=>{
+          sendEmailVerification(cred.user);
+          auth.signOut()
+        .catch((err: any) => {
+          console.error("Oops", err);
+ });
+
+        })
+
+    },
+    
   }
 });
 </script>
