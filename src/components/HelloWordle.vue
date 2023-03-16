@@ -13,6 +13,7 @@ const typedLetters: Ref<string[]> = ref([])
 const letterColors: Ref<Record<string, string>> = ref({})
 let showModal: Ref<boolean> = ref(false)
 let showModalRegister: Ref<boolean> = ref(false)
+let username = ref('')
 
 // Load the list of solutions from the txt file and choose a random one
 onBeforeMount( async () => {
@@ -184,11 +185,12 @@ function showRegisterModal() {
     <h1 @click="displaySolution" class="title" id="title" style="font-family: Anton,serif">Wordle Clone</h1>
     <button class="nav-button" @click="newGame" id="newgame" >New Game</button>
 
-    
-
+    <div class="username" v-if="username">
+      <p>Logged in as: {{username}}</p>
+    </div>
     <button class="nav-button login"  @click="showLoginModal" >Log in</button>
     <div v-show="showModal" @close="showModal = false">
-      <login :show-modal="showModal" @close="showModal = false"></login>
+      <login :show-modal="showModal" @close="showModal = false" @username="username = $event"></login>
     </div>
     <div v-show="showModalRegister" @close="showModalRegister = false">
       <register :show-modal-register="showModalRegister" @close="showModalRegister = false"></register>

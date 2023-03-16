@@ -71,10 +71,12 @@ export default defineComponent({
 
       signInWithEmailAndPassword(auth, loginEmail, loginPassword)
         .then((cred: UserCredential)=>{
-          if(cred.user?.emailVerified)
-            //Display signed in & username
-
+          if(cred.user?.emailVerified) {
+            // Display signed in & username
+            this.$emit('username', this.username)
             console.log("signed in");
+            console.log(this.username)
+          }
           else{
             //Display error to verify email
             auth.signOut()
