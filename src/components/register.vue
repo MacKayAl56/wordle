@@ -64,9 +64,7 @@ export default defineComponent({
       this.$emit('close');
     },
     createAccount():void {
-      //this.username = username;
-      //this.password = password;
-      
+
       const newEmail = this.username;
       const newPassword = this.password;
 
