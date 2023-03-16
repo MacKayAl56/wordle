@@ -185,9 +185,6 @@ function showRegisterModal() {
     <h1 @click="displaySolution" class="title" id="title" style="font-family: Anton,serif">Wordle Clone</h1>
     <button class="nav-button" @click="newGame" id="newgame" >New Game</button>
 
-    <div class="username" v-if="username">
-      <p>Logged in as: {{username}}</p>
-    </div>
     <button class="nav-button login"  @click="showLoginModal" >Log in</button>
     <div v-show="showModal" @close="showModal = false">
       <login :show-modal="showModal" @close="showModal = false" @username="username = $event"></login>
@@ -196,6 +193,10 @@ function showRegisterModal() {
       <register :show-modal-register="showModalRegister" @close="showModalRegister = false"></register>
     </div>
     <button class="nav-button register" @click="showRegisterModal">Register</button>
+  </div>
+
+  <div v-if="username" class="username">
+    <h3>Logged in as: {{username}}</h3>
   </div>
 
   <div class="field">

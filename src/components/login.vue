@@ -1,29 +1,29 @@
 <template>
-    <div class="modal" @click="closeModal" v-show="showModal">
-      <form @click.stop>
-        <h2>Log in </h2>
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input type="text" id="username" v-model="username" required>
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" v-model="password" required>
-        </div>
-        <button type="submit" @click="loginEmailPassword">Submit</button>
-        <button type="button" @click="closeModal">Cancel</button>
-      </form>
-    </div>
+  <div class="modal" @click="closeModal" v-show="showModal">
+    <form @click.stop @submit.prevent>
+      <h2>Log in </h2>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" v-model="username" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" v-model="password" required>
+      </div>
+      <button type="submit" @click="loginEmailPassword">Submit</button>
+      <button type="button" @click="closeModal">Cancel</button>
+    </form>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import {getFirestore, Firestore} from "firebase/firestore";
-import { getAnalytics } from "firebase/analytics";
-import { getAuth, connectAuthEmulator, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
+import { initializeApp } from "@firebase/app";
+import {getFirestore, Firestore} from "@firebase/firestore";
+import { getAnalytics } from "@firebase/analytics";
+import { getAuth, connectAuthEmulator, signInWithEmailAndPassword, UserCredential } from '@firebase/auth';
 import { connect } from 'http2';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -65,29 +65,20 @@ export default defineComponent({
     closeModal() {
       this.$emit('close');
     },
-    loginEmailPassword():void{
-      const loginEmail = this.username;
-      const loginPassword = this.password;
-
-      signInWithEmailAndPassword(auth, loginEmail, loginPassword)
-        .then((cred: UserCredential)=>{
-          if(cred.user?.emailVerified) {
-            // Display signed in & username
-            this.$emit('username', this.username)
-            console.log("signed in");
-            console.log(this.username)
-          }
-          else{
-            //Display error to verify email
-            auth.signOut()
-          }
-        })
-        .catch((err: any) => {
-            console.error("Oops", err);
- });
-
+    // login with email and password using firebase
+    async loginEmailPassword(event: Event) {
+      event.preventDefault();
+      try {
+        const userCredential: UserCredential = await signInWithEmailAndPassword(auth, this.username, this.password);
+        this.closeModal();
+        // emit username to parent
+        this.$emit('username', userCredential.user?.email);
+        console.log(userCredential.user?.email)
+      } catch (error) {
+        console.error(error);
+        // Handle login error
+      }
     }
-
   }
 });
 </script>

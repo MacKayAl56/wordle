@@ -19,9 +19,9 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import {getFirestore, Firestore} from "firebase/firestore";
-import { getAnalytics } from "firebase/analytics";
+import { initializeApp } from "@firebase/app";
+import {getFirestore, Firestore} from "@firebase/firestore";
+import { getAnalytics } from "@firebase/analytics";
 import { getAuth, connectAuthEmulator, signInWithEmailAndPassword, createUserWithEmailAndPassword, UserCredential, sendEmailVerification } from 'firebase/auth';
 import { connect } from 'http2';
 // TODO: Add SDKs for Firebase products that you want to use
@@ -73,6 +73,7 @@ export default defineComponent({
       createUserWithEmailAndPassword(auth, newEmail, newPassword)
         .then((cred:UserCredential)=>{
           sendEmailVerification(cred.user);
+          console.log("Account created");
           auth.signOut()
         .catch((err: any) => {
           console.error("Oops", err);
