@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import {onBeforeMount, onUnmounted, ref, Ref, watch} from 'vue'
+import {onBeforeMount, ref, Ref} from 'vue'
 import Keyboard from "./keyboard.vue";
 import Login from "./login.vue";
 import Register from "./register.vue";
 import '@fontsource/anton';
-import { getFirestore, collection, addDoc } from "@firebase/firestore";
+import {addDoc, collection, getFirestore} from "@firebase/firestore";
 
 const db = getFirestore();
 const gameStatistics = collection(db, "gameStatistics");
@@ -19,6 +19,7 @@ let showModal: Ref<boolean> = ref(false)
 let showModalRegister: Ref<boolean> = ref(false)
 let username = ref('')
 let userID = ref('')
+let timeStart = new Date().getTime();
 
 // Load the list of solutions from the txt file and choose a random one
 onBeforeMount( async () => {
@@ -116,10 +117,11 @@ function CheckForWin(word: string) {
     // Change the color of the newgame button to green
     document.getElementById("newgame")!.style.backgroundColor = "#538d4e";
     winner();
-    storeGameStats();
+    storeGameStats("won");
   }
   // If the user has guessed 6 words, they lose
   else if(lettersGuessed.value == 30){
+    storeGameStats("lost");
     alert('You lose. The answer was: '+ solutionWord.value);
     allowInput = false
   }
@@ -185,12 +187,15 @@ function showRegisterModal() {
 }
 
 // store the game stats in the firestore document
-async function storeGameStats() {
+async function storeGameStats(gameResult: string) {
   try {
     const docRef = await addDoc(gameStatistics, {
-      username: username.value,
       userID: userID.value,
-      score: lettersGuessed.value,
+      username: username.value,
+      secretWord: solutionWord.value,
+      gameResult: gameResult,
+      score: lettersGuessed.value / 5,
+      time: Math.ceil((new Date().getTime() - timeStart) / 1000) + 's',
       date: new Date()
     })
     console.log("Document written with ID: ", docRef.id);
@@ -205,7 +210,6 @@ async function storeGameStats() {
   <div class="header">
     <h1 @click="displaySolution" class="title" id="title" style="font-family: Anton,serif">Wordle Clone</h1>
     <button class="nav-button" @click="newGame" id="newgame" >New Game</button>
-
 
     <button v-if="!username" class="nav-button login"  @click="showLoginModal" >Log in</button>
 
