@@ -3,6 +3,7 @@ import {onBeforeMount, ref, Ref} from 'vue'
 import Keyboard from "./keyboard.vue";
 import Login from "./login.vue";
 import Register from "./register.vue";
+import Statistics from "./statistics.vue";
 import '@fontsource/anton';
 import {addDoc, collection, getFirestore} from "@firebase/firestore";
 
@@ -17,6 +18,7 @@ const typedLetters: Ref<string[]> = ref([])
 const letterColors: Ref<Record<string, string>> = ref({})
 let showModal: Ref<boolean> = ref(false)
 let showModalRegister: Ref<boolean> = ref(false)
+let showModalStatistics: Ref<boolean> = ref(false)
 let username = ref('')
 let userID = ref('')
 let timeStart = new Date().getTime();
@@ -186,6 +188,10 @@ function showRegisterModal() {
   allowInput = false
 }
 
+function showStatisticsModal() {
+  showModalStatistics.value = true
+}
+
 // store the game stats in the firestore document
 async function storeGameStats(gameResult: string) {
   try {
@@ -219,7 +225,11 @@ async function storeGameStats(gameResult: string) {
     <div v-show="showModalRegister" @close="showModalRegister = false; allowInput = true" >
       <register :show-modal-register="showModalRegister" @close="showModalRegister = false"></register>
     </div>
+    <div v-show="showModalStatistics" @close="showModalStatistics = false; allowInput = true" >
+      <statistics :show-modal-statistic="showModalStatistics" @close="showModalStatistics = false"></statistics>
+    </div>
       <button v-if="!username" class="nav-button register" @click="showRegisterModal">Register</button>
+      <button v-if="username" class="nav-button register" @click="showStatisticsModal">Stats</button>
       <h5 v-if="username" class="username">Welcome, {{username}}</h5>
   </div>
 
