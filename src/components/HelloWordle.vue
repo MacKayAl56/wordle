@@ -4,6 +4,10 @@ import Keyboard from "./keyboard.vue";
 import Login from "./login.vue";
 import Register from "./register.vue";
 import '@fontsource/anton';
+import { getFirestore, collection, addDoc } from "@firebase/firestore";
+
+const db = getFirestore();
+const gameStatistics = collection(db, "gameStatistics");
 
 const userWords: Ref<string[]> = ref([])
 const solutionWord: Ref<string[]> = ref([])
@@ -14,6 +18,7 @@ const letterColors: Ref<Record<string, string>> = ref({})
 let showModal: Ref<boolean> = ref(false)
 let showModalRegister: Ref<boolean> = ref(false)
 let username = ref('')
+let userID = ref('')
 
 // Load the list of solutions from the txt file and choose a random one
 onBeforeMount( async () => {
@@ -111,6 +116,7 @@ function CheckForWin(word: string) {
     // Change the color of the newgame button to green
     document.getElementById("newgame")!.style.backgroundColor = "#538d4e";
     winner();
+    storeGameStats();
   }
   // If the user has guessed 6 words, they lose
   else if(lettersGuessed.value == 30){
@@ -178,6 +184,21 @@ function showRegisterModal() {
   allowInput = false
 }
 
+// store the game stats in the firestore document
+async function storeGameStats() {
+  try {
+    const docRef = await addDoc(gameStatistics, {
+      username: username.value,
+      userID: userID.value,
+      score: lettersGuessed.value,
+      date: new Date()
+    })
+    console.log("Document written with ID: ", docRef.id);
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+}
+
 </script>
 
 <template>
@@ -189,9 +210,9 @@ function showRegisterModal() {
     <button v-if="!username" class="nav-button login"  @click="showLoginModal" >Log in</button>
 
     <div v-show="showModal" @close="showModal = false">
-      <login :show-modal="showModal" @close="showModal = false" @username="username = $event"></login>
+      <login :show-modal="showModal" @close="showModal = false; allowInput = true" @userID="userID = $event" @username="username = $event"></login>
     </div>
-    <div v-show="showModalRegister" @close="showModalRegister = false">
+    <div v-show="showModalRegister" @close="showModalRegister = false; allowInput = true" >
       <register :show-modal-register="showModalRegister" @close="showModalRegister = false"></register>
     </div>
       <button v-if="!username" class="nav-button register" @click="showRegisterModal">Register</button>

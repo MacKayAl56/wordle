@@ -73,6 +73,8 @@ export default defineComponent({
         this.closeModal();
         // emit username to parent
         this.$emit('username', userCredential.user?.email);
+        // emit userID to parent
+        this.$emit('userID', userCredential.user?.uid);
         console.log(userCredential.user?.email)
       } catch (error) {
         console.error(error);
