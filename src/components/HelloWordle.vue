@@ -226,7 +226,7 @@ async function storeGameStats(gameResult: string) {
       <register :show-modal-register="showModalRegister" @close="showModalRegister = false"></register>
     </div>
     <div v-show="showModalStatistics" @close="showModalStatistics = false; allowInput = true" >
-      <statistics :show-modal-statistic="showModalStatistics" @close="showModalStatistics = false"></statistics>
+      <statistics :user-id="userID" :show-modal-statistic="showModalStatistics" @close="showModalStatistics = false"></statistics>
     </div>
       <button v-if="!username" class="nav-button register" @click="showRegisterModal">Register</button>
       <button v-if="username" class="nav-button register" @click="showStatisticsModal">Stats</button>

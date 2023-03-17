@@ -1,7 +1,7 @@
 <template>
   <div class="modal" @click="closeModal" v-show="showModalStatistic">
     <div class="container" >
-      <a> date: </a>
+      <a> userID: {{ userId }}</a>
       <a> time: </a>
       <a> score: </a>
     </div>
@@ -15,6 +15,10 @@ export default defineComponent({
   props: {
     showModalStatistic: {
       type: Boolean as PropType<boolean>,
+      required: true
+    },
+    userId: {
+      type: String as PropType<string>,
       required: true
     }
   },
