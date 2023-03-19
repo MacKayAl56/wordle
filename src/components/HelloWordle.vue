@@ -9,8 +9,8 @@ import {addDoc, collection, getFirestore} from "@firebase/firestore";
 
 const db = getFirestore();
 const gameStatistics = collection(db, "gameStatistics");
-
 const userWords: Ref<string[]> = ref([])
+
 const solutionWord: Ref<string[]> = ref([])
 const validWords: Ref<string[]> = ref([])
 const lettersGuessed: Ref<number> = ref(0)

@@ -1,18 +1,27 @@
 <template>
   <div class="modal" @click="closeModal" v-show="showModalStatistic">
-    <form @click.stop @submit.prevent>
-    <h2>Game history for user: {{ userId }}</h2>
-    <div class="form-" v-for="index in 2">
-      <a><b> Game: {{ index }}</b></a>
-      <br>
-      <a> Date: </a>
-      <br>
-      <a> Total time: </a>
-      <br>
-      <a> Result: </a>
+    <div class = "container">
+      <h2>Game history for user: {{ userId }}<br></h2>
+    <table id="statsTable">
+      <tr>
+        <th>Game</th>
+        <th>Date</th>
+        <th>Secret Word</th>
+        <th>Total Time</th>
+        <th>Result</th>
+      </tr>
+      <tr v-for="(document,index) in array" :key="index">
+        <td>{{ index }}</td>
+        <td>{{ document.date }}</td>
+        <td>{{ document.secretWord }}</td>
+        <td>{{ document.time }}</td>
+        <td>{{ document.gameResult }}</td>
+      </tr>
+      
+    </table>
       
     </div>
-  </form>
+  
       
 <!--    Use a separate Vue component to show the past game statistics (retrieved from Firestore). Add a few basic functionalities to this page:
 
@@ -26,9 +35,41 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, PropType} from "vue";
+import {ref, Ref, defineComponent, PropType,ComponentInternalInstance} from "vue";
+import userID from "./login.vue"
+import{ DocumentReference, DocumentSnapshot, CollectionReference, QueryDocumentSnapshot, QuerySnapshot, collection, getDocs, query, where} from "firebase/firestore"
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "@firebase/app";
+import {getFirestore, Firestore} from "@firebase/firestore";
+import { getAnalytics } from "@firebase/analytics";
+import { getAuth, connectAuthEmulator, signInWithEmailAndPassword, UserCredential } from '@firebase/auth';
+import { connect } from 'http2';
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCQm1cPSv2TByJ7qmwTuRWMPhNj6aKZl7Y",
+  authDomain: "wordle-5db5b.firebaseapp.com",
+  projectId: "wordle-5db5b",
+  storageBucket: "wordle-5db5b.appspot.com",
+  messagingSenderId: "835958338222",
+  appId: "1:835958338222:web:16ad75f9dcf40ad0f9733f",
+  measurementId: "G-84HV2KBLWL"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db:Firestore = getFirestore(app);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const userDocuments: any[]=[];
+let array: any[][]=[];
+//connectAuthEmulator(auth,"http:localhost:5173");
 
 export default defineComponent({
+  name: 'Statistics',
   props: {
     showModalStatistic: {
       type: Boolean as PropType<boolean>,
@@ -37,32 +78,31 @@ export default defineComponent({
     userId: {
       type: String as PropType<string>,
       required: true
+    },
+    solutionWord:{
+      type: String as PropType<string>
     }
+  },
+  data() {
   },
   methods: {
     closeModal() {
       this.$emit('close');
-    },
-    getUserDocs(){
-      const db = getFirestore()
-      const gameStatistics:CollectionReference = collection(db,"gameStatistics")
-      const qry = query(gameStatistics, where("userID","==", userId.value))
-      getDocs(qry)
-        .then((myQueryRes: QuerySnapshot)=>{
-          myQueryRes.forEach((myDoc:QueryDocumentSnapshot)=>{
-            const data = myDoc.data();
-            numGames ++;
-            games.push(data);
-          })
-          
-        });
-      
-    },
-    displayDoc(){
-
     }
-  }
-});
+  },
+  setup(){
+    const fetchDocuments = async () => {
+      const qry = query(collection(db, 'gameStatistics'), where("userID", "==", userID.value))
+      const querySnapshot = await getDocs(qry)
+      querySnapshot.forEach(doc => {
+        userDocuments.push(doc.data())
+    })
+    fetchDocuments();
+    array = userDocuments.map(doc => Object.values(doc));
+    }
+
+}});
+
 </script>
 
 <style scoped>
