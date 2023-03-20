@@ -253,6 +253,8 @@ async function storeGameStats(gameResult: string) {
   .nav-button.login { grid-area: 1 / 4 / 2 / 6; }
 
   .nav-button.register { grid-area: 1 / 5 / 2 / 6; }
+  
+  .nav-button.stats {grid-area:1/6/2/6;}
 
   .field {
     justify-content: center;

@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import HelloWordle from "./HelloWordle.vue";
-import Login from "./Login.vue";
+import Login from "./login.vue";
 import Register from "./register.vue";
+import Statistics from "./statistics.vue";
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -18,7 +19,13 @@ const routes: Array<RouteRecordRaw> = [
         path: '/register',
         name: 'Register',
         component: Register,
+    },
+    {
+        path: '/statistics',
+        name: 'Statistics',
+        component: Statistics,
     }
+
 ];
 
 const router = createRouter({

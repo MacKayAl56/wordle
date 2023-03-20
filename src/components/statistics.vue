@@ -1,7 +1,23 @@
 <template>
-  <div class="modal" @click="closeModal" v-show="showModalStatistic">
+  <div class="modal" @click="goHome()">
     <div class = "container">
       <h2>Game history for user: {{ userId }}<br></h2>
+    <table>
+      <tr>
+        <th>Game</th>
+        <th>Date</th>
+        <th>Secret word</th>
+        <th>Total Time</th>
+        <th>Result</th>
+      </tr>
+      <tr v-for="(document, index) in gameStatistics" :key="index">
+        <td>{{ index }}</td>
+        <td>{{ document.date }}</td>
+        <td>{{ document.secretWord }}</td>
+        <td>{{ document.time }}</td>
+        <td>{{document.gameResult}}</td>
+      </tr>
+    </table>
 
     </div>
   
@@ -81,6 +97,9 @@ export default defineComponent({
     closeModal() {
       this.$emit("close");
     },
+    goHome() {
+      this.$router.push("/");
+    }
   }
 });
 

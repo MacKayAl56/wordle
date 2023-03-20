@@ -19,13 +19,18 @@ onMounted(() => {
   })
 })
 
+
 </script>
 
 <template>
   <nav class="navbar">
     <div class="navbar-left">
       <button @click="newGame">New Game</button>
+      <button v-if="userDisplay" style="margin-right: 5px">
+        <router-link style="text-decoration: none; color: inherit;" to="/statistics">Your Statistics<br></router-link>
+      </button>
     </div>
+    
     <div class="navbar-center">
       <h1>Wordle Clone</h1>
     </div>
