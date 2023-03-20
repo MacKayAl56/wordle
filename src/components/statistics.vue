@@ -1,5 +1,5 @@
 <template>
-  <div class="modal" @click="goHome()">
+  <div class="modal" @click="closeModal">
     <div class = "container">
       <h2>Game history for user: {{ userId }}<br></h2>
     <table>
