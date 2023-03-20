@@ -2,24 +2,7 @@
   <div class="modal" @click="closeModal" v-show="showModalStatistic">
     <div class = "container">
       <h2>Game history for user: {{ userId }}<br></h2>
-    <table id="statsTable">
-      <tr>
-        <th>Game</th>
-        <th>Date</th>
-        <th>Secret Word</th>
-        <th>Total Time</th>
-        <th>Result</th>
-      </tr>
-      <tr v-for="(document,index) in array" :key="index">
-        <td>{{ index }}</td>
-        <td>{{ document.date }}</td>
-        <td>{{ document.secretWord }}</td>
-        <td>{{ document.time }}</td>
-        <td>{{ document.gameResult }}</td>
-      </tr>
-      
-    </table>
-      
+
     </div>
   
       
@@ -35,9 +18,8 @@
 </template>
 
 <script lang="ts">
-import {ref, Ref, defineComponent, PropType,ComponentInternalInstance} from "vue";
-import userID from "./login.vue"
-import{ DocumentReference, DocumentSnapshot, CollectionReference, QueryDocumentSnapshot, QuerySnapshot, collection, getDocs, query, where} from "firebase/firestore"
+import {ref, Ref, defineComponent, PropType,ComponentInternalInstance, onMounted, SetupContext} from "vue";
+import{ DocumentReference, DocumentSnapshot, CollectionReference, QueryDocumentSnapshot, QuerySnapshot, collection, getDocs, query, where, doc, getDoc} from "firebase/firestore"
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "@firebase/app";
 import {getFirestore, Firestore} from "@firebase/firestore";
@@ -64,8 +46,8 @@ const app = initializeApp(firebaseConfig);
 const db:Firestore = getFirestore(app);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
-const userDocuments: any[]=[];
-let array: any[][]=[];
+const gameStatistics: any[] = [];
+const querySnapshot = await getDocs(collection(db, "gameStatistics"));
 //connectAuthEmulator(auth,"http:localhost:5173");
 
 export default defineComponent({
@@ -84,24 +66,23 @@ export default defineComponent({
     }
   },
   data() {
+    return {
+      gameStatistics: gameStatistics,
+    };
+  },
+  mounted() {
+       querySnapshot.forEach((doc) => {
+         // doc.data() is never undefined for query doc snapshots
+         gameStatistics.push(doc.data());
+       });
+       console.log(gameStatistics)
   },
   methods: {
     closeModal() {
-      this.$emit('close');
-    }
-  },
-  setup(){
-    const fetchDocuments = async () => {
-      const qry = query(collection(db, 'gameStatistics'), where("userID", "==", userID.value))
-      const querySnapshot = await getDocs(qry)
-      querySnapshot.forEach(doc => {
-        userDocuments.push(doc.data())
-    })
-    fetchDocuments();
-    array = userDocuments.map(doc => Object.values(doc));
-    }
-
-}});
+      this.$emit("close");
+    },
+  }
+});
 
 </script>
 
