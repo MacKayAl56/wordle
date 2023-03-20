@@ -1,7 +1,7 @@
 <template>
   <div class="modal" @click="closeModal">
     <div class = "container">
-      <h2>Game history for user: {{ userId }}<br></h2>
+      <h2>Your Game History:<br></h2>
     <table>
       <tr>
         <th>Game</th>
@@ -31,7 +31,8 @@ import {getFirestore, Firestore} from "@firebase/firestore";
 import { getAnalytics } from "@firebase/analytics";
 import { getAuth, connectAuthEmulator, signInWithEmailAndPassword, UserCredential } from '@firebase/auth';
 import { connect } from 'http2';
-import {emitter} from "./emitter";
+import { emitter } from "./emitter";
+import  userID  from "./HelloWordle.vue"
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -63,7 +64,7 @@ export default defineComponent({
       type: Boolean as PropType<boolean>,
       required: true
     },
-    userId: {
+    userID: {
       type: String as PropType<string>,
       required: true
     }
@@ -75,14 +76,17 @@ export default defineComponent({
   },
   setup() {
   onMounted(() => {
-    emitter.on('userid', (data: unknown) => {
-      userId.value = data as string
-      console.log(data)
-    })
+      emitter.on('userid', (data: unknown) => {
+        userID.value = data as string
+        console.log(data)
+      })
+
        querySnapshot.forEach((doc) => {
          // doc.data() is never undefined for query doc snapshots
-         gameStatistics.push(doc.data());
-
+         if (doc.data().userID === userID.value) {
+          gameStatistics.push(doc.data());
+         }
+         
         })
   });
   },
