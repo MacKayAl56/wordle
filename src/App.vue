@@ -1,19 +1,68 @@
 <script setup lang="ts">
-import HelloWordle from './components/HelloWordle.vue'
-import Keyboard from "./components/keyboard.vue";
+import {onMounted, ref, Ref} from "vue";
+import { emitter } from "./components/emitter";
+
+let userDisplay = ref('')
+let userID = ref('')
+
+
+function newGame() {
+ //window.location.reload();
+  console.log(userDisplay)
+}
+
+// listen for updateUsername emitted from login.vue
+onMounted(() => {
+  emitter.on('username', (data: unknown) => {
+    userDisplay.value = data as string
+    console.log(data)
+  })
+})
+
 </script>
 
 <template>
-  <HelloWordle />
+  <nav class="navbar">
+    <div class="navbar-left">
+      <button @click="newGame">New Game</button>
+    </div>
+    <div class="navbar-center">
+      <h1>Wordle Clone</h1>
+    </div>
+    <div class="navbar-right">
+      <button v-if="!userDisplay" style="margin-right: 5px">
+        <router-link style="text-decoration: none; color: inherit;" to="/login" >Login</router-link>
+      </button>
+      <h5 v-if="userDisplay" style="margin-right: 5px">Welcome, {{userDisplay}}</h5>
+      <button v-if="!userDisplay">
+        <router-link style="text-decoration: none; color: inherit;" to="/register" >Register</router-link>
+      </button>
+    </div>
+  </nav>
+  <router-view />
 </template>
 
 <style scoped>
-.center {
+.navbar {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+  padding: 0 20px;
+  border-bottom: #3a3a3c 1px solid;
+  margin-bottom: 50px;
+}
+.navbar-center{
+  margin-left: 70px;
+  font-family: Anton,serif;
+  font-size: 0.8rem;
   justify-content: center;
   align-items: center;
-  margin-left: 150px;
-  margin-right: 150px;
+  display: flex;
+}
+button:hover {
+  text-decoration: none;
+  background-color: #538d4e;
 }
 
 </style>

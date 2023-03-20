@@ -1,6 +1,7 @@
 <template>
-  <div class="modal" @click="closeModal" v-show="showModalRegister">
-    <form @click.stop>
+  <HelloWordle />
+  <div class="modal" @click="goHome()">
+    <form @click.stop @submit.prevent>
       <h2>Create an account:</h2>
       <div class="form-group">
         <label for="username">Username</label>
@@ -10,14 +11,14 @@
         <label for="password">Password</label>
         <input type="password" id="password" v-model="password" required>
       </div>
-      <button type="submit" @click="createAccount">Submit</button>
-      <button type="button" @click="closeModal">Cancel</button>
+      <button @click="createAccount">Submit</button>
     </form>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
+import HelloWordle from "./HelloWordle.vue";
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "@firebase/app";
 import {getFirestore, Firestore} from "@firebase/firestore";
@@ -47,12 +48,7 @@ const auth = getAuth(app);
 //connectAuthEmulator(auth,"http:localhost:5173");
 
 export default defineComponent({
-  props: {
-    showModalRegister: {
-      type: Boolean as PropType<boolean>,
-      required: true
-    }
-  },
+  components: {HelloWordle},
   data() {
     return {
       username: '',
@@ -60,13 +56,14 @@ export default defineComponent({
     }
   },
   methods: {
-    closeModal() {
-      this.$emit('close');
+    goHome() {
+      this.$router.push("/");
     },
     createAccount():void {
 
       const newEmail = this.username;
       const newPassword = this.password;
+
 
       createUserWithEmailAndPassword(auth, newEmail, newPassword)
         .then((cred:UserCredential)=>{
@@ -76,7 +73,6 @@ export default defineComponent({
         .catch((err: any) => {
           console.error("Oops", err);
  });
-
         })
 
     },

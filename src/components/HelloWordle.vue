@@ -1,24 +1,20 @@
 <script setup lang="ts">
-import {onBeforeMount, ref, Ref} from 'vue'
+import {onBeforeMount, onMounted, ref, Ref} from 'vue'
 import Keyboard from "./keyboard.vue";
-import Login from "./login.vue";
-import Register from "./register.vue";
-import Statistics from "./statistics.vue";
 import '@fontsource/anton';
+import { emitter } from "./emitter";
 import {addDoc, collection, getFirestore} from "@firebase/firestore";
 
 const db = getFirestore();
 const gameStatistics = collection(db, "gameStatistics");
-const userWords: Ref<string[]> = ref([])
 
+const userWords: Ref<string[]> = ref([])
 const solutionWord: Ref<string[]> = ref([])
 const validWords: Ref<string[]> = ref([])
 const lettersGuessed: Ref<number> = ref(0)
 const typedLetters: Ref<string[]> = ref([])
 const letterColors: Ref<Record<string, string>> = ref({})
-let showModal: Ref<boolean> = ref(false)
-let showModalRegister: Ref<boolean> = ref(false)
-let showModalStatistics: Ref<boolean> = ref(false)
+let showModalStatistics = ref(false)
 let username = ref('')
 let userID = ref('')
 let timeStart = new Date().getTime();
@@ -41,6 +37,13 @@ onBeforeMount( async () => {
   const text = await response.text();
   const wordsArray = text.split('\n');
   validWords.value = wordsArray
+})
+
+onMounted(() => {
+  emitter.on('username', (data: unknown) => {
+    username.value = data as string
+    console.log(data)
+  })
 })
 
 function addOneWord() {
@@ -117,7 +120,6 @@ function CheckForWin(word: string) {
   if (solutionWord.value.join() === (word)) {
     allowInput = false
     // Change the color of the newgame button to green
-    document.getElementById("newgame")!.style.backgroundColor = "#538d4e";
     winner();
     storeGameStats("won");
   }
@@ -177,17 +179,6 @@ function winner() {
   }
 }
 
-// Show the login modal by setting showModal in the login modal component to true using refs
-function showLoginModal() {
-  showModal.value = true
-  allowInput = false
-}
-
-function showRegisterModal() {
-  showModalRegister.value = true
-  allowInput = false
-}
-
 function showStatisticsModal() {
   showModalStatistics.value = true
 }
@@ -213,26 +204,6 @@ async function storeGameStats(gameResult: string) {
 </script>
 
 <template>
-  <div class="header">
-    <h1 @click="displaySolution" class="title" id="title" style="font-family: Anton,serif">Wordle Clone</h1>
-    <button class="nav-button" @click="newGame" id="newgame" >New Game</button>
-
-    <button v-if="!username" class="nav-button login"  @click="showLoginModal" >Log in</button>
-
-    <div v-show="showModal" @close="showModal = false">
-      <login :show-modal="showModal" @close="showModal = false; allowInput = true" @userID="userID = $event" @username="username = $event"></login>
-    </div>
-    <div v-show="showModalRegister" @close="showModalRegister = false; allowInput = true" >
-      <register :show-modal-register="showModalRegister" @close="showModalRegister = false"></register>
-    </div>
-    <div v-show="showModalStatistics" @close="showModalStatistics = false; allowInput = true" >
-      <statistics :user-id="userID" :show-modal-statistic="showModalStatistics" @close="showModalStatistics = false"></statistics>
-    </div>
-      <button v-if="!username" class="nav-button register" @click="showRegisterModal">Register</button>
-      <button v-if="username" class="nav-button register" @click="showStatisticsModal">Your Statistics</button>
-      <h5 v-if="username" class="username">Welcome, {{username}}</h5>
-  </div>
-
   <div class="field">
     <div class="grid">
       <div class="box" id="letter-boxes" v-for="index in 30"></div>
@@ -240,7 +211,6 @@ async function storeGameStats(gameResult: string) {
   </div>
 
   <div style="justify-content: center">
-
     <keyboard @key="onPress" :letterColors="letterColors" :key="onPress"/>
   </div>
 </template>

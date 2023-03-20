@@ -1,6 +1,6 @@
 <template>
-  <div class="modal" @click="closeModal" v-show="showModal">
-    <form @click.stop @submit.prevent>
+  <div class="modal">
+    <form >
       <h2>Log in </h2>
       <div class="form-group">
         <label for="username">Username</label>
@@ -11,13 +11,14 @@
         <input type="password" id="password" v-model="password" required>
       </div>
       <button type="submit" @click="loginEmailPassword">Submit</button>
-      <button type="button" @click="closeModal">Cancel</button>
+      <button type="submit" @click="goHome">Cancel</button>
     </form>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
+import { emitter } from './emitter';
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "@firebase/app";
@@ -49,12 +50,6 @@ const auth = getAuth(app);
 
 export default defineComponent({
   name: 'LoginModal',
-  props: {
-    showModal: {
-      type: Boolean as PropType<boolean>,
-      required: true
-    }
-  },
   data() {
     return {
       username: '',
@@ -62,20 +57,21 @@ export default defineComponent({
     }
   },
   methods: {
-    closeModal() {
-      this.$emit('close');
+    goHome() {
+      this.$router.push({ name: 'Home' });
     },
+
     // login with email and password using firebase
     async loginEmailPassword(event: Event) {
       event.preventDefault();
       try {
         const userCredential: UserCredential = await signInWithEmailAndPassword(auth, this.username, this.password);
-        this.closeModal();
-        // emit username to parent
-        this.$emit('username', userCredential.user?.email);
-        // emit userID to parent
-        this.$emit('userID', userCredential.user?.uid);
-        console.log(userCredential.user?.email)
+        // emit event to update username
+        emitter.emit('username', userCredential.user?.email);
+        emitter.emit('updateUserID', userCredential.user?.uid);
+        console.log(userCredential.user?.email);
+        // go to home page
+        this.goHome();
       } catch (error) {
         console.error(error);
         // Handle login error
@@ -92,7 +88,7 @@ export default defineComponent({
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   z-index: 1000;
   display: flex;
   justify-content: center;
