@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import {onMounted, ref, Ref} from "vue";
 import { emitter } from "./components/emitter";
+import Statistics from "./components/statistics.vue";
 
 let userDisplay = ref('')
 let userID = ref('')
-
+let showModalStatistics: Ref<boolean> = ref(false)
 
 function newGame() {
  //window.location.reload();
@@ -17,8 +18,15 @@ onMounted(() => {
     userDisplay.value = data as string
     console.log(data)
   })
+  emitter.on('userid', (data: unknown) => {
+    userID.value = data as string
+    console.log(data)
+  })
 })
 
+function showStatisticsModal() {
+  showModalStatistics.value = true
+}
 
 </script>
 
@@ -26,11 +34,13 @@ onMounted(() => {
   <nav class="navbar">
     <div class="navbar-left">
       <button @click="newGame">New Game</button>
-      <button v-if="userDisplay" style="margin-right: 5px">
-        <router-link style="text-decoration: none; color: inherit;" to="/statistics">Your Statistics<br></router-link>
-      </button>
+
+      <div v-show="showModalStatistics" @close="showModalStatistics = false;" >
+        <statistics :user-id="userID" :show-modal-statistic="showModalStatistics" @close="showModalStatistics = false"></statistics>
+      </div>
     </div>
-    
+
+
     <div class="navbar-center">
       <h1>Wordle Clone</h1>
     </div>
@@ -38,7 +48,7 @@ onMounted(() => {
       <button v-if="!userDisplay" style="margin-right: 5px">
         <router-link style="text-decoration: none; color: inherit;" to="/login" >Login</router-link>
       </button>
-      <h5 v-if="userDisplay" style="margin-right: 5px">Welcome, {{userDisplay}}</h5>
+      <button v-if="userDisplay" class="nav-button register" @click="showStatisticsModal">{{ userDisplay }}'s Stats</button>
       <button v-if="!userDisplay">
         <router-link style="text-decoration: none; color: inherit;" to="/register" >Register</router-link>
       </button>
@@ -68,6 +78,14 @@ onMounted(() => {
 button:hover {
   text-decoration: none;
   background-color: #538d4e;
+}
+.navbar-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+h5 {
+  margin-right: 25px;
 }
 
 </style>

@@ -68,7 +68,7 @@ export default defineComponent({
         const userCredential: UserCredential = await signInWithEmailAndPassword(auth, this.username, this.password);
         // emit event to update username
         emitter.emit('username', userCredential.user?.email);
-        emitter.emit('updateUserID', userCredential.user?.uid);
+        emitter.emit('userid', userCredential.user?.uid);
         console.log(userCredential.user?.email);
         // go to home page
         this.goHome();

@@ -18,18 +18,7 @@
         <td>{{document.gameResult}}</td>
       </tr>
     </table>
-
     </div>
-  
-      
-<!--    Use a separate Vue component to show the past game statistics (retrieved from Firestore). Add a few basic functionalities to this page:
-
-    Sort by date/time (most recent first)
-    Sort by game duration
-    Sort by the number of attempts to guess the secret word
-    Show a histogram of the number of attempts. Look for third party libraries to show 2D charts.-->
-
-
   </div>
 </template>
 
@@ -42,6 +31,7 @@ import {getFirestore, Firestore} from "@firebase/firestore";
 import { getAnalytics } from "@firebase/analytics";
 import { getAuth, connectAuthEmulator, signInWithEmailAndPassword, UserCredential } from '@firebase/auth';
 import { connect } from 'http2';
+import {emitter} from "./emitter";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -64,7 +54,7 @@ const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const gameStatistics: any[] = [];
 const querySnapshot = await getDocs(collection(db, "gameStatistics"));
-//connectAuthEmulator(auth,"http:localhost:5173");
+const userId = ref('')
 
 export default defineComponent({
   name: 'Statistics',
@@ -76,9 +66,6 @@ export default defineComponent({
     userId: {
       type: String as PropType<string>,
       required: true
-    },
-    solutionWord:{
-      type: String as PropType<string>
     }
   },
   data() {
@@ -86,12 +73,17 @@ export default defineComponent({
       gameStatistics: gameStatistics,
     };
   },
-  mounted() {
+  onMounted() {
+    emitter.on('userid', (data: unknown) => {
+      userId.value = data as string
+      console.log(data)
+    })
        querySnapshot.forEach((doc) => {
          // doc.data() is never undefined for query doc snapshots
          gameStatistics.push(doc.data());
+
        });
-       console.log(gameStatistics)
+    console.log(gameStatistics)
   },
   methods: {
     closeModal() {
