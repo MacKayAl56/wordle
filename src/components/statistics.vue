@@ -73,7 +73,8 @@ export default defineComponent({
       gameStatistics: gameStatistics,
     };
   },
-  onMounted() {
+  setup() {
+  onMounted(() => {
     emitter.on('userid', (data: unknown) => {
       userId.value = data as string
       console.log(data)
@@ -82,8 +83,8 @@ export default defineComponent({
          // doc.data() is never undefined for query doc snapshots
          gameStatistics.push(doc.data());
 
-       });
-    console.log(gameStatistics)
+        })
+  });
   },
   methods: {
     closeModal() {
