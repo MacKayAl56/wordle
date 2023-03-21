@@ -57,6 +57,14 @@ const auth = getAuth(app);
 const gameStatistics: any[] = [];
 const userId = ref('')
 
+interface GameStatistic {
+  date: string;
+  secretWord: string;
+  time: number;
+  gameResult: string;
+  userID: string;
+}
+
 export default defineComponent({
   name: 'Statistics',
   props: {
@@ -71,7 +79,7 @@ export default defineComponent({
   },
   data() {
     return {
-      gameStatistics: gameStatistics,
+      gameStatistics: [] as GameStatistic[],
     };
   },
   methods: {
@@ -81,12 +89,13 @@ export default defineComponent({
     async getGameStatistics() {
       const querySnapshot = await getDocs(collection(db, "gameStatistics"));
       // filter the game statistics by the user id
+      const filteredGameStatistics: GameStatistic[] = [];
       querySnapshot.forEach((doc) => {
         if (doc.data().userID === this.userId) {
-          gameStatistics.push(doc.data());
+          filteredGameStatistics.push(doc.data() as GameStatistic);
         }
       });
-      console.log(gameStatistics)
+      this.gameStatistics = filteredGameStatistics;
     },
   },
 });
