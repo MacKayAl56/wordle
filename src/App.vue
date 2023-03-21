@@ -8,19 +8,16 @@ let userID = ref('')
 let showModalStatistics: Ref<boolean> = ref(false)
 
 function newGame() {
- //window.location.reload();
-  console.log(userDisplay)
+ window.location.reload();
 }
 
 // listen for updateUsername emitted from login.vue
 onMounted(() => {
   emitter.on('username', (data: unknown) => {
     userDisplay.value = data as string
-    console.log(data)
   })
   emitter.on('userid', (data: unknown) => {
     userID.value = data as string
-    console.log(data)
   })
 })
 
@@ -45,13 +42,9 @@ function showStatisticsModal() {
       <h1>Wordle Clone</h1>
     </div>
     <div class="navbar-right">
-      <button v-if="!userDisplay" style="margin-right: 5px">
-        <router-link style="text-decoration: none; color: inherit;" to="/login" >Login</router-link>
-      </button>
-      <button v-if="userDisplay" class="nav-button register" @click="showStatisticsModal">{{ userDisplay }}'s Stats</button>
-      <button v-if="!userDisplay">
-        <router-link style="text-decoration: none; color: inherit;" to="/register" >Register</router-link>
-      </button>
+      <button v-if="!userDisplay" @click="$router.push('/login')">Login</button>
+      <button v-if="userDisplay" @click="showStatisticsModal">{{ userDisplay }}'s Stats</button>
+      <button v-if="!userDisplay" @click="$router.push('/register')" >Register</button>
     </div>
   </nav>
   <router-view />
@@ -86,6 +79,9 @@ button:hover {
 }
 h5 {
   margin-right: 25px;
+}
+button {
+  margin-right: 15px;
 }
 
 </style>

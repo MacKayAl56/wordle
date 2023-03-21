@@ -1,5 +1,5 @@
 <template>
-  <div class="modal" @click="closeModal">
+  <div class="modal">
     <div class = "container">
       <h2>Game history for user: {{ userId }}<br></h2>
     <table>
@@ -18,12 +18,14 @@
         <td>{{document.gameResult}}</td>
       </tr>
     </table>
+      <button @click="getGameStatistics">Refresh</button>
+      <button @click="closeModal">Close</button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import {ref, Ref, defineComponent, PropType,ComponentInternalInstance, onMounted, SetupContext} from "vue";
+import {ref, Ref, defineComponent, PropType, ComponentInternalInstance, onMounted, SetupContext, watch} from "vue";
 import{ DocumentReference, DocumentSnapshot, CollectionReference, QueryDocumentSnapshot, QuerySnapshot, collection, getDocs, query, where, doc, getDoc} from "firebase/firestore"
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "@firebase/app";
@@ -53,7 +55,6 @@ const db:Firestore = getFirestore(app);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const gameStatistics: any[] = [];
-const querySnapshot = await getDocs(collection(db, "gameStatistics"));
 const userId = ref('')
 
 export default defineComponent({
@@ -73,27 +74,21 @@ export default defineComponent({
       gameStatistics: gameStatistics,
     };
   },
-  setup() {
-  onMounted(() => {
-    emitter.on('userid', (data: unknown) => {
-      userId.value = data as string
-      console.log(data)
-    })
-       querySnapshot.forEach((doc) => {
-         // doc.data() is never undefined for query doc snapshots
-         gameStatistics.push(doc.data());
-
-        })
-  });
-  },
   methods: {
     closeModal() {
       this.$emit("close");
     },
-    goHome() {
-      this.$router.push("/");
-    }
-  }
+    async getGameStatistics() {
+      const querySnapshot = await getDocs(collection(db, "gameStatistics"));
+      // filter the game statistics by the user id
+      querySnapshot.forEach((doc) => {
+        if (doc.data().userID === this.userId) {
+          gameStatistics.push(doc.data());
+        }
+      });
+      console.log(gameStatistics)
+    },
+  },
 });
 
 </script>
