@@ -11,6 +11,8 @@
         <input type="password" id="password" v-model="password" required>
       </div>
       <button type="submit" @click="loginEmailPassword">Submit</button>
+      <button type="submit" @click="googleSignIn">Sign In with Google</button>
+
       <button type="submit" @click="goHome">Cancel</button>
     </form>
   </div>
@@ -24,7 +26,7 @@ import { emitter } from './emitter';
 import { initializeApp } from "@firebase/app";
 import {getFirestore, Firestore} from "@firebase/firestore";
 import { getAnalytics } from "@firebase/analytics";
-import { getAuth, connectAuthEmulator, signInWithEmailAndPassword, UserCredential } from '@firebase/auth';
+import { getAuth,signInWithPopup,connectAuthEmulator, signInWithEmailAndPassword, UserCredential, GoogleAuthProvider } from '@firebase/auth';
 import { connect } from 'http2';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -47,6 +49,8 @@ const db:Firestore = getFirestore(app);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
 //connectAuthEmulator(auth,"http:localhost:5173");
+const provider = new GoogleAuthProvider();
+
 
 export default defineComponent({
   name: 'LoginModal',
@@ -66,16 +70,31 @@ export default defineComponent({
       event.preventDefault();
       try {
         const userCredential: UserCredential = await signInWithEmailAndPassword(auth, this.username, this.password);
-        // emit event to update username
         emitter.emit('username', userCredential.user?.email);
         emitter.emit('userid', userCredential.user?.uid);
         console.log(userCredential.user?.email);
-        // go to home page
         this.goHome();
       } catch (error) {
         console.error(error);
-        // Handle login error
       }
+    },
+
+    googleSignIn() {
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          const token = credential?.accessToken;
+          const user = result.user;
+          emitter.emit('username', user?.email);
+          emitter.emit('userid', user?.uid);
+          this.goHome();
+        }).catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          const email = error.customData.email;
+          const credential = GoogleAuthProvider.credentialFromError(error);
+  
+        });
     }
   }
 });
