@@ -21,6 +21,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import { emitter } from './emitter';
+import store from './store';
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "@firebase/app";
@@ -72,6 +73,8 @@ export default defineComponent({
         const userCredential: UserCredential = await signInWithEmailAndPassword(auth, this.username, this.password);
         emitter.emit('username', userCredential.user?.email);
         emitter.emit('userid', userCredential.user?.uid);
+        store.commit('setUsername', userCredential.user?.email)
+        store.commit('setUserID', userCredential.user?.uid)
         console.log(userCredential.user?.email);
         this.goHome();
       } catch (error) {

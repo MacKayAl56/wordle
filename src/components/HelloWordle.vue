@@ -1,9 +1,20 @@
 <script setup lang="ts">
-import {onBeforeMount, onMounted, ref, Ref} from 'vue'
+import {computed, onBeforeMount, onMounted, ref, Ref} from 'vue'
 import Keyboard from "./keyboard.vue";
 import '@fontsource/anton';
 import { emitter } from "./emitter";
 import {addDoc, collection, getFirestore} from "@firebase/firestore";
+import {mapGetters} from "vuex";
+import store, { State } from './store'
+import { useStore} from "vuex";
+
+// get username from vuex store
+const username = computed(() => {
+  return store.getters.getUsername
+})
+const userID = computed(() => {
+  return store.getters.getUserID
+})
 
 const db = getFirestore();
 const gameStatistics = collection(db, "gameStatistics");
@@ -15,8 +26,8 @@ const lettersGuessed: Ref<number> = ref(0)
 const typedLetters: Ref<string[]> = ref([])
 const letterColors: Ref<Record<string, string>> = ref({})
 let showModalStatistics = ref(false)
-let username = ref('')
-let userID = ref('')
+/*let username = ref('')
+let userID = ref('')*/
 let timeStart = new Date().getTime();
 
 // Load the list of solutions from the txt file and choose a random one
@@ -40,10 +51,10 @@ onBeforeMount( async () => {
 })
 
 onMounted(() => {
-  emitter.on('username', (data: unknown) => {
+/*  emitter.on('username', (data: unknown) => {
     username.value = data as string
     console.log(data)
-  })
+  })*/
 })
 
 function addOneWord() {
