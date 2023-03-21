@@ -185,7 +185,7 @@ async function storeGameStats(gameResult: string) {
     const docRef = await addDoc(gameStatistics, {
       userID: userID.value,
       username: username.value,
-      secretWord: solutionWord.value,
+      secretWord: solutionWord.value[0],
       gameResult: gameResult,
       score: lettersGuessed.value / 5,
       time: Math.ceil((new Date().getTime() - timeStart) / 1000) + 's',
