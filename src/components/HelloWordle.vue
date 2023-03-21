@@ -56,6 +56,7 @@ function addOneWord() {
     CheckForWin(word);
   }
   else {
+    console.log("invalid word: " + word)
     shake();
   }
 }

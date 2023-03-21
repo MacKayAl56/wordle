@@ -1,5 +1,5 @@
 <template>
-  <div class="modal">
+  <div class="modal" >
     <div class = "container">
       <h2>Game history for {{ displayUsername }}<br></h2>
     <table class="game-table">
@@ -20,8 +20,10 @@
         <td>{{document.gameResult}}</td>
       </tr>
     </table>
-      <button @click="getGameStatistics">Refresh</button>
       <button @click="closeModal">Close</button>
+      <button @click="sortByDuration">Sort by duration</button>
+      <button @click="sortByScore">Sort by score</button>
+      <button @click="sortByDate">Sort by date</button>
     </div>
   </div>
 </template>
@@ -36,7 +38,6 @@ import { initializeApp } from "@firebase/app";
 import {getFirestore, Firestore} from "@firebase/firestore";
 import { getAnalytics } from "@firebase/analytics";
 import { getAuth  } from '@firebase/auth';
-
 
 const firebaseConfig = {
   apiKey: "AIzaSyCQm1cPSv2TByJ7qmwTuRWMPhNj6aKZl7Y",
@@ -55,10 +56,6 @@ const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const gameStatistics: any[] = [];
 
-// get username from Vuex store
-const username = computed(() => {
-  return store.getters.getUsername
-})
 const displayUsername = computed(() => {
   return store.getters.getDisplayUsername
 })
@@ -105,7 +102,24 @@ export default defineComponent({
       });
       this.gameStatistics = filteredGameStatistics;
     },
-  },
+    sortByDuration() {
+      this.gameStatistics.sort((a, b) => {
+        // convert a and b to numbers and get rid of the last character
+        const aTime = Number(a.time.toString().slice(0, -1));
+        const bTime = Number(b.time.toString().slice(0, -1));
+        return aTime - bTime;
+      });
+    },
+    sortByScore() {
+      this.gameStatistics.sort((a, b) => (a.score > b.score ? 1 : -1));
+    },
+    sortByDate() {
+      this.gameStatistics.sort((a, b) => {
+       return a.date.seconds * 1000 - b.date.seconds * 1000
+      });
+      console.log(this.gameStatistics)
+    },
+},
   watch: {
     showModalStatistic: function (show: boolean) {
       if (show) {
