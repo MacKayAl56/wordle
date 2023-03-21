@@ -165,7 +165,7 @@ form {
   background-color: rgba(0, 0, 0, 0.9);
   padding: 65px;
   border-radius: 5px;
-  margin-bottom: 400px;
+  margin-bottom: 150px;
 }
 
 h2 {
@@ -194,6 +194,42 @@ button {
   background-color: rgba(0, 0, 0, 0.9);
   padding: 65px;
   border-radius: 5px;
-  margin-bottom: 400px;
+  margin-bottom: 150px;
 }
+@media (max-width: 920px) {
+    .game-table th,
+    .game-table td {
+      border: 2px solid black;
+      padding: 5px;
+      font-size: 0.5rem;
+    }
+
+    form,
+    .container {
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    label {
+      font-size: 0.5rem;
+      margin-bottom: 3px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      padding: 3px;
+      font-size: 0.7rem;
+    }
+
+    button {
+      margin-top: 10px;
+      margin-right: 5px;
+      font-size: 0.7rem;
+    }
+  }
 </style>

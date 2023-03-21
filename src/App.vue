@@ -84,5 +84,32 @@ h5 {
 button {
   margin-right: 15px;
 }
+@media (max-width: 920px) {
+  .navbar{
+    margin-bottom: 15px;
+    padding: 0 5px;
+  }
+  h1 {
+    font-size: 1.2rem;
+    margin-right: 40px;
+  }
+  .navbar-left {
+    width: 100px;
+  }
+  .navbar-right {
+    width: 100px;
+  }
+  .navbar-center {
+    width: 150px;
+  }
+  button {
+    margin-right: 5px;
+    margin-left: 5px;
+    height: 35px;
+    width: 65px;
+    font-size: x-small;
+    margin-right: 5px;
+  }
+}
 
 </style>
