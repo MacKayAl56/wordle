@@ -2,11 +2,9 @@
 import {computed, onBeforeMount, onMounted, ref, Ref} from 'vue'
 import Keyboard from "./keyboard.vue";
 import '@fontsource/anton';
-import { emitter } from "./emitter";
 import {addDoc, collection, getFirestore} from "@firebase/firestore";
-import {mapGetters} from "vuex";
-import store, { State } from './store'
-import { useStore} from "vuex";
+import store  from './store'
+
 
 // get username from vuex store
 const username = computed(() => {
@@ -26,8 +24,6 @@ const lettersGuessed: Ref<number> = ref(0)
 const typedLetters: Ref<string[]> = ref([])
 const letterColors: Ref<Record<string, string>> = ref({})
 let showModalStatistics = ref(false)
-/*let username = ref('')
-let userID = ref('')*/
 let timeStart = new Date().getTime();
 
 // Load the list of solutions from the txt file and choose a random one
@@ -48,13 +44,6 @@ onBeforeMount( async () => {
   const text = await response.text();
   const wordsArray = text.split('\n');
   validWords.value = wordsArray
-})
-
-onMounted(() => {
-/*  emitter.on('username', (data: unknown) => {
-    username.value = data as string
-    console.log(data)
-  })*/
 })
 
 function addOneWord() {
@@ -83,7 +72,6 @@ function newGame() {
 function displayWord(word: string) {
   lettersGuessed.value -= 5
   typedLetters.value = []
-  const colors = []
   const letters = word.split('')
   for (let i = 0; i < letters.length; i++) {
 
@@ -190,10 +178,6 @@ function winner() {
   }
 }
 
-function showStatisticsModal() {
-  showModalStatistics.value = true
-}
-
 // store the game stats in the firestore document
 async function storeGameStats(gameResult: string) {
   try {
@@ -234,38 +218,6 @@ async function storeGameStats(gameResult: string) {
     grid-column-gap: 10px;
     grid-row-gap: 10px;
   }
-
-  .header {
-    display: grid;
-    grid-area: header;
-    justify-content: space-evenly;
-    justify-items: center;
-    align-content: space-evenly;
-    align-items: center;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: 60px;
-    border-bottom: #3a3a3c 1px solid;
-    margin-bottom: 60px;
-  }
-
-  .title { grid-area: 1 / 3 / 2 / 4;
-    margin-top: 30px;
-  }
-  .nav-button { grid-area: 1 / 0 / 2 / 6;
-    justify-content: center;
-    align-items: center;
-    margin-right: 100px;
-    color: white;
-  }
-  .nav-button:hover {
-    background-color: #538d4e;
-  }
-
-  .nav-button.login { grid-area: 1 / 4 / 2 / 6; }
-
-  .nav-button.register { grid-area: 1 / 5 / 2 / 6; }
-  
-  .nav-button.stats {grid-area:1/6/2/6;}
 
   .field {
     justify-content: center;

@@ -1,25 +1,24 @@
 <script setup lang="ts">
-import {onMounted, ref, Ref} from "vue";
-import { emitter } from "./components/emitter";
+import {computed, ref, Ref} from "vue";
 import Statistics from "./components/statistics.vue";
+import store  from './components/store'
 
-let userDisplay = ref('')
-let userID = ref('')
+// get username from Vuex store
+const username = computed(() => {
+  return store.getters.getUsername
+})
+const displayUsername = computed(() => {
+  return store.getters.getDisplayUsername
+})
+const userID = computed(() => {
+  return store.getters.getUserID
+})
+
 let showModalStatistics: Ref<boolean> = ref(false)
 
 function newGame() {
  window.location.reload();
 }
-
-// listen for updateUsername emitted from login.vue
-onMounted(() => {
-  emitter.on('username', (data: unknown) => {
-    userDisplay.value = data as string
-  })
-  emitter.on('userid', (data: unknown) => {
-    userID.value = data as string
-  })
-})
 
 function showStatisticsModal() {
   showModalStatistics.value = true
@@ -42,9 +41,9 @@ function showStatisticsModal() {
       <h1>Wordle Clone</h1>
     </div>
     <div class="navbar-right">
-      <button v-if="!userDisplay" @click="$router.push('/login')">Login</button>
-      <button v-if="userDisplay" @click="showStatisticsModal">{{ userDisplay }}'s Stats</button>
-      <button v-if="!userDisplay" @click="$router.push('/register')" >Register</button>
+      <button v-if="!username" @click="$router.push('/login')">Login</button>
+      <button v-if="username" @click="showStatisticsModal">{{ displayUsername }}'s Stats</button>
+      <button v-if="!username" @click="$router.push('/register')" >Register</button>
     </div>
   </nav>
   <router-view />
@@ -67,10 +66,6 @@ function showStatisticsModal() {
   justify-content: center;
   align-items: center;
   display: flex;
-}
-button:hover {
-  text-decoration: none;
-  background-color: #538d4e;
 }
 .navbar-right {
   display: flex;

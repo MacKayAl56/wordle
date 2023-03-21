@@ -11,7 +11,10 @@
         <label for="password">Password</label>
         <input type="password" id="password" v-model="password" required>
       </div>
-      <button @click="createAccount">Submit</button>
+      <div class="button-row">
+        <button type="submit" @click="createAccount">Submit</button>
+        <button type="button" @click="goHome">Cancel</button>
+      </div>
     </form>
   </div>
 </template>
@@ -23,13 +26,8 @@ import HelloWordle from "./HelloWordle.vue";
 import { initializeApp } from "@firebase/app";
 import {getFirestore, Firestore} from "@firebase/firestore";
 import { getAnalytics } from "@firebase/analytics";
-import { getAuth, connectAuthEmulator, signInWithEmailAndPassword, createUserWithEmailAndPassword, UserCredential, sendEmailVerification } from 'firebase/auth';
-import { connect } from 'http2';
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getAuth, createUserWithEmailAndPassword, UserCredential, sendEmailVerification } from 'firebase/auth';
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyCQm1cPSv2TByJ7qmwTuRWMPhNj6aKZl7Y",
   authDomain: "wordle-5db5b.firebaseapp.com",
@@ -45,7 +43,6 @@ const app = initializeApp(firebaseConfig);
 const db:Firestore = getFirestore(app);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
-//connectAuthEmulator(auth,"http:localhost:5173");
 
 export default defineComponent({
   components: {HelloWordle},
@@ -60,10 +57,8 @@ export default defineComponent({
       this.$router.push("/");
     },
     createAccount():void {
-
       const newEmail = this.username;
       const newPassword = this.password;
-
 
       createUserWithEmailAndPassword(auth, newEmail, newPassword)
         .then((cred:UserCredential)=>{
@@ -71,12 +66,9 @@ export default defineComponent({
           console.log("Account created");
           auth.signOut()
         .catch((err: any) => {
-          console.error("Oops", err);
- });
+          console.error("Oops", err);});
         })
-
     },
-    
   }
 });
 </script>
@@ -99,7 +91,7 @@ form {
   background-color: rgba(0, 0, 0, 0.9);
   padding: 65px;
   border-radius: 5px;
-  margin-bottom: 400px;
+  margin-bottom: 300px;
 }
 
 h2 {
@@ -114,6 +106,10 @@ label {
   display: block;
   margin-bottom: 5px;
 }
+.button-row {
+  display: flex;
+  justify-content: space-between;
+}
 
 input[type="text"],
 input[type="password"] {
@@ -126,9 +122,8 @@ input[type="password"] {
 button[type="submit"],
 button[type="button"] {
   display: block;
-  margin-top: 10px;
-  padding: 5px;
-  border-radius: 3px;
+  margin-top: 15px;
+  padding: 10px;
 }
 
 button[type="submit"] {

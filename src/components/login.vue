@@ -1,6 +1,7 @@
 <template>
-  <div class="modal">
-    <form >
+  <HelloWordle />
+  <div class="modal" @click="goHome()">
+    <form @click.stop @submit.prevent>
       <h2>Log in </h2>
       <div class="form-group">
         <label for="username">Username</label>
@@ -10,30 +11,26 @@
         <label for="password">Password</label>
         <input type="password" id="password" v-model="password" required>
       </div>
-      <button type="submit" @click="loginEmailPassword">Submit</button>
-      <button type="submit" @click="googleSignIn">Sign In with Google</button>
-
-      <button type="submit" @click="goHome">Cancel</button>
+      <div class="button-row">
+        <button type="submit" @click="loginEmailPassword">Submit</button>
+        <button type="button" @click="goHome">Cancel</button>
+      </div>
+      <button type="Google" @click="googleSignIn">Sign In with Google</button>
     </form>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
-import { emitter } from './emitter';
+import { defineComponent } from 'vue';
 import store from './store';
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "@firebase/app";
 import {getFirestore, Firestore} from "@firebase/firestore";
 import { getAnalytics } from "@firebase/analytics";
-import { getAuth,signInWithPopup,connectAuthEmulator, signInWithEmailAndPassword, UserCredential, GoogleAuthProvider } from '@firebase/auth';
-import { connect } from 'http2';
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getAuth,signInWithPopup, signInWithEmailAndPassword, UserCredential, GoogleAuthProvider } from '@firebase/auth';
+import HelloWordle from "./HelloWordle.vue";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyCQm1cPSv2TByJ7qmwTuRWMPhNj6aKZl7Y",
   authDomain: "wordle-5db5b.firebaseapp.com",
@@ -49,12 +46,12 @@ const app = initializeApp(firebaseConfig);
 const db:Firestore = getFirestore(app);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
-//connectAuthEmulator(auth,"http:localhost:5173");
 const provider = new GoogleAuthProvider();
 
 
 export default defineComponent({
   name: 'LoginModal',
+  components: {HelloWordle},
   data() {
     return {
       username: '',
@@ -70,10 +67,10 @@ export default defineComponent({
     async loginEmailPassword(event: Event) {
       event.preventDefault();
       try {
-        const userCredential: UserCredential = await signInWithEmailAndPassword(auth, this.username, this.password);
-        emitter.emit('username', userCredential.user?.email);
-        emitter.emit('userid', userCredential.user?.uid);
+        // We emulate login with just a username by appending @mail.com to the username so firebase can handle the login
+        const userCredential: UserCredential = await signInWithEmailAndPassword(auth, this.username + "@mail.com", this.password);
         store.commit('setUsername', userCredential.user?.email)
+        store.commit('setDisplayUsername', this.username)
         store.commit('setUserID', userCredential.user?.uid)
         console.log(userCredential.user?.email);
         this.goHome();
@@ -88,15 +85,11 @@ export default defineComponent({
           const credential = GoogleAuthProvider.credentialFromResult(result);
           const token = credential?.accessToken;
           const user = result.user;
-          emitter.emit('username', user?.email);
-          emitter.emit('userid', user?.uid);
+          store.commit('setUsername', user?.email)
+          store.commit('setUserID', user?.uid)
           this.goHome();
         }).catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          const email = error.customData.email;
-          const credential = GoogleAuthProvider.credentialFromError(error);
-  
+          console.error(error);
         });
     }
   }
@@ -121,7 +114,7 @@ form {
   background-color: rgba(0, 0, 0, 0.9);
   padding: 65px;
   border-radius: 5px;
-  margin-bottom: 400px;
+  margin-bottom: 300px;
 }
 
 h2 {
@@ -136,6 +129,10 @@ label {
   display: block;
   margin-bottom: 5px;
 }
+.button-row {
+  display: flex;
+  justify-content: space-between;
+}
 
 input[type="text"],
 input[type="password"] {
@@ -149,8 +146,7 @@ button[type="submit"],
 button[type="button"] {
   display: block;
   margin-top: 10px;
-  padding: 5px;
-  border-radius: 3px;
+  padding: 10px;
 }
 
 button[type="submit"] {
@@ -165,6 +161,11 @@ button[type="submit"]:hover {
 button[type="button"] {
   background-color: #f44336;
   color: white;
+}
+button[type="Google"] {
+  background-color: #4285f4;
+  color: white;
+  margin-top: 20px;
 }
 
 button[type="button"]:hover {

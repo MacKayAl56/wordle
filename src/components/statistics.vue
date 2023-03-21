@@ -1,8 +1,8 @@
 <template>
   <div class="modal">
     <div class = "container">
-      <h2>Game history for user: {{ userId }}<br></h2>
-    <table>
+      <h2>Game history for {{ displayUsername }}<br></h2>
+    <table class="game-table">
       <tr>
         <th>Game</th>
         <th>Date</th>
@@ -12,7 +12,7 @@
       </tr>
       <tr v-for="(document, index) in gameStatistics" :key="index">
         <td>{{ index }}</td>
-        <td>{{ document.date }}</td>
+        <td>{{ new Date(document.date.seconds * 1000).toLocaleDateString() }}</td>
         <td>{{ document.secretWord }}</td>
         <td>{{ document.time }}</td>
         <td>{{document.gameResult}}</td>
@@ -25,20 +25,17 @@
 </template>
 
 <script lang="ts">
-import {ref, Ref, defineComponent, PropType, ComponentInternalInstance, onMounted, SetupContext, watch} from "vue";
-import{ DocumentReference, DocumentSnapshot, CollectionReference, QueryDocumentSnapshot, QuerySnapshot, collection, getDocs, query, where, doc, getDoc} from "firebase/firestore"
+import { defineComponent, PropType, computed } from "vue";
+import store  from './store'
+
+import{ collection, getDocs } from "firebase/firestore"
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "@firebase/app";
 import {getFirestore, Firestore} from "@firebase/firestore";
 import { getAnalytics } from "@firebase/analytics";
-import { getAuth, connectAuthEmulator, signInWithEmailAndPassword, UserCredential } from '@firebase/auth';
-import { connect } from 'http2';
-import {emitter} from "./emitter";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getAuth  } from '@firebase/auth';
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
 const firebaseConfig = {
   apiKey: "AIzaSyCQm1cPSv2TByJ7qmwTuRWMPhNj6aKZl7Y",
   authDomain: "wordle-5db5b.firebaseapp.com",
@@ -55,7 +52,14 @@ const db:Firestore = getFirestore(app);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const gameStatistics: any[] = [];
-const userId = ref('')
+
+// get username from Vuex store
+const username = computed(() => {
+  return store.getters.getUsername
+})
+const displayUsername = computed(() => {
+  return store.getters.getDisplayUsername
+})
 
 interface GameStatistic {
   date: string;
@@ -80,6 +84,7 @@ export default defineComponent({
   data() {
     return {
       gameStatistics: [] as GameStatistic[],
+      displayUsername: displayUsername.value,
     };
   },
   methods: {
@@ -98,6 +103,13 @@ export default defineComponent({
       this.gameStatistics = filteredGameStatistics;
     },
   },
+  watch: {
+    showModalStatistic: function (show: boolean) {
+      if (show) {
+        this.getGameStatistics();
+      }
+    },
+  }
 });
 
 </script>
@@ -115,6 +127,11 @@ export default defineComponent({
   justify-content: center;
   align-items: center;
 }
+.game-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 20px;
+}
 
 form {
   background-color: rgba(0, 0, 0, 0.9);
@@ -125,10 +142,6 @@ form {
 
 h2 {
   margin-top: 0;
-}
-
-.form-group {
-  margin-bottom: 10px;
 }
 
 label {
@@ -144,9 +157,9 @@ input[type="password"] {
   border-radius: 3px;
 }
 
-
-button[type="button"]:hover {
-  background-color: #da190b;
+button {
+  margin-top: 15px;
+  margin-right: 10px;
 }
 
 .container {
