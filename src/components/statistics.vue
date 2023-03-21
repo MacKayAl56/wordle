@@ -6,6 +6,7 @@
       <tr>
         <th>Game</th>
         <th>Date</th>
+        <th>Score</th>
         <th>Secret word</th>
         <th>Total Time</th>
         <th>Result</th>
@@ -13,6 +14,7 @@
       <tr v-for="(document, index) in gameStatistics" :key="index">
         <td>{{ index }}</td>
         <td>{{ new Date(document.date.seconds * 1000).toLocaleDateString() }}</td>
+        <td>{{ document.score }}</td>
         <td>{{ document.secretWord }}</td>
         <td>{{ document.time }}</td>
         <td>{{document.gameResult}}</td>
@@ -63,6 +65,7 @@ const displayUsername = computed(() => {
 
 interface GameStatistic {
   date: string;
+  score: number;
   secretWord: string;
   time: number;
   gameResult: string;
