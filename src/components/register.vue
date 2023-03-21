@@ -9,6 +9,7 @@
       </div>
       <div class="form-group">
         <label for="password">Password</label>
+        <label style="font-size: 0.7rem; color: gray; margin-bottom: 8px" for="password">Must be more than 6 characters</label>
         <input type="password" id="password" v-model="password" required>
       </div>
       <div class="button-row">
@@ -57,17 +58,19 @@ export default defineComponent({
       this.$router.push("/");
     },
     createAccount():void {
-      const newEmail = this.username;
+      const newEmail = this.username + "@mail.com";
       const newPassword = this.password;
 
       createUserWithEmailAndPassword(auth, newEmail, newPassword)
         .then((cred:UserCredential)=>{
           sendEmailVerification(cred.user);
           console.log("Account created");
+
           auth.signOut()
         .catch((err: any) => {
           console.error("Oops", err);});
         })
+      this.goHome();
     },
   }
 });
@@ -90,6 +93,7 @@ export default defineComponent({
 form {
   background-color: rgba(0, 0, 0, 0.9);
   padding: 65px;
+  width: 200px;
   border-radius: 5px;
   margin-bottom: 300px;
 }
