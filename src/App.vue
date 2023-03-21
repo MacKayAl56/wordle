@@ -60,17 +60,23 @@ function showStatisticsModal() {
   margin-bottom: 50px;
 }
 .navbar-center{
-  margin-left: 70px;
   font-family: Anton,serif;
-  font-size: 0.8rem;
+  width: 200px;
+  display: flex;
   justify-content: center;
   align-items: center;
-  display: flex;
 }
 .navbar-right {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  width: 200px;
+}
+.navbar-left {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 200px;
 }
 h5 {
   margin-right: 25px;
