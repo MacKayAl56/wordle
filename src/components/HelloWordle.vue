@@ -5,7 +5,6 @@ import '@fontsource/anton';
 import {addDoc, collection, getFirestore} from "@firebase/firestore";
 import store  from './store'
 
-
 // get username from vuex store
 const username = computed(() => {
   return store.getters.getUsername
@@ -23,8 +22,10 @@ const validWords: Ref<string[]> = ref([])
 const lettersGuessed: Ref<number> = ref(0)
 const typedLetters: Ref<string[]> = ref([])
 const letterColors: Ref<Record<string, string>> = ref({})
-let showModalStatistics = ref(false)
 let timeStart = new Date().getTime();
+
+// Store the solution word in the vuex store
+
 
 // Load the list of solutions from the txt file and choose a random one
 onBeforeMount( async () => {
@@ -34,8 +35,9 @@ onBeforeMount( async () => {
 
   // Choose a random word from the list and add it to solutionWord
   const randomWord = wordsArray[Math.floor(Math.random() * wordsArray.length)];
-  solutionWord.value.push(randomWord)
-  console.log(solutionWord.value)
+  solutionWord.value.push(randomWord);
+  store.commit('setSolutionWord', solutionWord.value[0]);
+  console.log("Solution: ", solutionWord.value[0]);
 })
 
 // Load the list of valid words from the txt file

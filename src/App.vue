@@ -13,11 +13,19 @@ const displayUsername = computed(() => {
 const userID = computed(() => {
   return store.getters.getUserID
 })
+const solutionWord = computed(() => {
+  return store.getters.getSolutionWord
+})
 
 let showModalStatistics: Ref<boolean> = ref(false)
+const title = ref("Wordle clone")
 
 function newGame() {
  window.location.reload();
+}
+function revealWord() {
+  console.log(solutionWord.value)
+  title.value = solutionWord.value;
 }
 
 function showStatisticsModal() {
@@ -35,10 +43,8 @@ function showStatisticsModal() {
         <statistics :user-id="userID" :show-modal-statistic="showModalStatistics" @close="showModalStatistics = false"></statistics>
       </div>
     </div>
-
-
     <div class="navbar-center">
-      <h1>Wordle Clone</h1>
+      <h1 @click="revealWord" v-text="title"></h1>
     </div>
     <div class="navbar-right">
       <button v-if="!username" @click="$router.push('/login')">Login</button>

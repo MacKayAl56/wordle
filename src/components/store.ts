@@ -4,6 +4,7 @@ export interface State {
     username: string;
     displayUsername: string;
     userID: string;
+    solutionWord: string;
 }
 
 export default createStore<State>({
@@ -11,6 +12,7 @@ export default createStore<State>({
         username: '',
         displayUsername: '',
         userID: '',
+        solutionWord: '',
     },
     mutations: {
         setUsername(state, payload: string) {
@@ -22,6 +24,9 @@ export default createStore<State>({
         setUserID(state, payload: string) {
             state.userID = payload;
         },
+        setSolutionWord(state, payload: string) {
+            state.solutionWord = payload;
+        }
     },
     actions: {
         setUsername({ commit }, payload: string) {
@@ -33,6 +38,9 @@ export default createStore<State>({
         setUserID({ commit }, payload: string) {
             commit('setUserID', payload);
         },
+        setSolutionWord({ commit }, payload: string) {
+            commit('setSolutionWord', payload);
+        }
     },
     getters: {
         getUsername(state) {
@@ -44,6 +52,9 @@ export default createStore<State>({
         getUserID(state) {
             return state.userID;
         },
+        getSolutionWord(state) {
+            return state.solutionWord;
+        }
     },
 });
 

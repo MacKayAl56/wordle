@@ -16,6 +16,7 @@
         <button type="button" @click="goHome">Cancel</button>
       </div>
       <button type="Google" @click="googleSignIn">Sign In with Google</button>
+      <h6> Hint: click the game title to reveal the solution!</h6>
     </form>
   </div>
 </template>
@@ -114,7 +115,8 @@ form {
   background-color: rgba(0, 0, 0, 0.9);
   padding: 65px;
   border-radius: 5px;
-  margin-bottom: 300px;
+  margin-bottom: 200px;
+  width: 200px;
 }
 
 h2 {
