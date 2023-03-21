@@ -130,7 +130,18 @@ export default defineComponent({
 .game-table {
   border-collapse: collapse;
   width: 100%;
-  margin-top: 20px;
+}
+
+.game-table th, .game-table td {
+  border: 4px solid black;
+  padding: 8px;
+  text-align: left;
+  border-radius: 3px;
+}
+
+.game-table th {
+  background-color: #538d4e;
+  font-weight: normal;
 }
 
 form {
